@@ -1,5 +1,10 @@
 name: Review app on pull request
 
+description: Deploy, sync and delete review apps on Clever Cloud for every pull request
+
+branding:
+  icon: upload-cloud
+  color: blue
 on:
   pull_request_target:
     types: [opened, closed, synchronize]
