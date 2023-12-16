@@ -4,7 +4,7 @@ description: Deploy, sync and delete review apps on Clever Cloud for every pull 
 
 branding:
   icon: upload-cloud
-  color: blue
+  color: red
 on:
   pull_request_target:
     types: [opened, closed, synchronize]
