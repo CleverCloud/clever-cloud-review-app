@@ -10,7 +10,8 @@ on:
     types: [opened, closed, synchronize]
     branches: [ main ]
 
-
+# Inject these secrets in your GitHub repository.
+# List more secrets if needed, for example: HUGO_VERSION: ${{ secrets.HUGO_VERSION }}
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
@@ -28,7 +29,6 @@ jobs:
       contents: read
     environment:
       name: PR review apps
-      url: clever-doc-preprod-${{ env.BRANCH_NAME }}.cleverapps.io
     steps:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check out repository code
@@ -44,26 +44,34 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
       - name: install clever-tools
         run: npm install -g clever-tools
-      - name: Create app and configure app
+      - name: Create app
+      # Use "clever create" to deploy your app.
+      # Replace <type>, <app-name> and <region>
         run: | 
-          clever login --token ${{ env.CLEVER_TOKEN }} --secret ${{ env.CLEVER_SECRET }}
-          clever create --type static-apache doc-review-${{ env.BRANCH_NAME }} --alias doc-review-${{ env.BRANCH_NAME }} --region par --org ${{secrets.ORGA_ID}}
-          clever env set CC_PRE_BUILD_HOOK "./clevercloud-deploy-script.sh"
-          clever env set CC_WEBROOT "/public"
-          clever env set HUGO_ENV "production"
-          clever env set HUGO_VERSION ${{env.HUGO_VERSION}}
-          clever env set CC_PHP_VERSION "7"
-          clever env set CC_CGI_IMPLEMENTATION "proxy_fcgi"
-          clever env set CC_COMPOSER_VERSION "2"
+          clever create --type <type> <app-name>-${{ env.BRANCH_NAME }} --alias <app-name>-${{ env.BRANCH_NAME }} --region <region> --org ${{secrets.ORGA_ID}}
+      - name: Set evironment variables
+      # Set environment variable with "clever env set".
+      # For example: clever env set CC_WEBROOT "/public"
+        run: |
+          clever env set <VARIABLE_NAME> "<variable_value>"
           clever domain add clever-doc-review-${{ env.BRANCH_NAME }}.cleverapps.io
+      - name: Set domain
+      # Set review app domain with "clever domain add".
+      # Replace <app-name>
+      # Inject your secrets as well, for ex:
+      #clever env set HUGO_VERSION ${{env.HUGO_VERSION}}
+        run: |
+          clever domain add <app-name>-${{ env.BRANCH_NAME }}.cleverapps.io
       - name: Deploy
         run: clever deploy
+      # Post your domain in PR's discussion
+      # Replace <app-name>
       - name: Comment PR
         uses: actions/github-script@v5
         with:
           script: |
             const issue_number = context.payload.pull_request.number;
-            const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://clever-doc-review-${process.env.BRANCH_NAME}.cleverapps.io)`;
+            const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://<app-name>-${process.env.BRANCH_NAME}.cleverapps.io)`;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -73,6 +81,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
+  # Deploy review apps on new commits
   update:
     if: github.event.action == 'synchronize'
     runs-on: ubuntu-latest
@@ -89,15 +98,17 @@ jobs:
       - name: install clever-tools
         run: npm install -g clever-tools
       - name: Link and update app
+      # Replace <app-name>
         run: | 
-          clever link -o ${{ env.ORGA_ID }} doc-review-${{ env.BRANCH_NAME }}
+          clever link -o ${{ env.ORGA_ID }} <app-name>-${{ env.BRANCH_NAME }}
           clever deploy
       - name: Comment PR
         uses: actions/github-script@v5
         with:
+        # Replace <app-name>
           script: |
             const issue_number = context.payload.pull_request.number;
-            const message = `🚀 Your app has been updated and is available [here](https://clever-doc-review-${process.env.BRANCH_NAME}.cleverapps.io)`;
+            const message = `🚀 Your app has been updated and is available [here](https://<app-name>-${process.env.BRANCH_NAME}.cleverapps.io)`;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -107,6 +118,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # Delete review app when the PR is closed (merged or not)
   delete:
     runs-on: ubuntu-latest
     permissions:
@@ -117,10 +129,10 @@ jobs:
       - name: install clever-tools
         run: npm install -g clever-tools
       - name: Delete app
+      # Replace <app-name>
         run: |
-          clever login --token ${{ env.CLEVER_TOKEN }} --secret ${{ env.CLEVER_SECRET }}
-          clever link -o ${{ env.ORGA_ID }} doc-review-${{ env.BRANCH_NAME }}
-          clever delete --alias doc-review-${{ env.BRANCH_NAME }} --yes
+          clever link -o ${{ env.ORGA_ID }} <app-name>-${{ env.BRANCH_NAME }}
+          clever delete --alias <app-name>-${{ env.BRANCH_NAME }} --yes
       - name: Comment PR
         uses: actions/github-script@v5
         with:
