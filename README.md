@@ -1,5 +1,5 @@
 
-# Review apps on Clever Cloud
+# Review Apps on Clever Cloud
 
 This GitHub Action does the following
 
@@ -13,7 +13,7 @@ This GitHub Action does the following
 - An [organisation](https://developers.clever-cloud.com/doc/account/administrate-organization/) in Clever Cloud
 - [Clever Cloud CLI](https://developers.clever-cloud.com/doc/cli/getting_started/) installed in your machine to inject your tokens
 
-## How to use this Action
+## How to Use this Action
 
 Place this script in your repository in `.github/workflows/` and modify the following values:
 
@@ -54,7 +54,7 @@ Place this script in your repository in `.github/workflows/` and modify the foll
 - `syd` (Sydney, OVHcloud)
 - `wsw` (Warsaw, OVHcloud)
 
-## Secrets you'll need
+## Secrets You'll Need
 
 - `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `clever-tools.json` after installing the CLI (example path on Mac: `~/.config/clever-cloud/clever-tools.json`)
 - `ORGA_ID`: the organisation in which your app is created
