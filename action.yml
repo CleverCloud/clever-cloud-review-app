@@ -1,4 +1,4 @@
-name: Review app on pull request
+name: Clever Cloud Review App on Pull Requests
 
 description: Deploy, sync and delete review apps on Clever Cloud for every pull request
 
@@ -52,14 +52,14 @@ jobs:
       - name: Set evironment variables
       # Set environment variable with "clever env set".
       # For example: clever env set CC_WEBROOT "/public"
+      # Inject your secrets as well, for ex:
+      #clever env set HUGO_VERSION ${{env.HUGO_VERSION}}
         run: |
           clever env set <VARIABLE_NAME> "<variable_value>"
           clever domain add clever-doc-review-${{ env.BRANCH_NAME }}.cleverapps.io
       - name: Set domain
       # Set review app domain with "clever domain add".
       # Replace <app-name>
-      # Inject your secrets as well, for ex:
-      #clever env set HUGO_VERSION ${{env.HUGO_VERSION}}
         run: |
           clever domain add <app-name>-${{ env.BRANCH_NAME }}.cleverapps.io
       - name: Deploy
