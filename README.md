@@ -59,6 +59,8 @@ Place this script in your repository in `.github/workflows/` and modify the foll
 - `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `clever-tools.json` after installing the CLI (example path on Mac: `~/.config/clever-cloud/clever-tools.json`)
 - `ORGA_ID`: the organisation in which your app is created
 
+⚠️ This script runs in the context of the base repository and won't work accross forks, because your fork won't have access to secrets from this repository. This is a GitHub Action security measure and there isn't any way of overriding this using GitHub Actions. Any pull request from a fork will therefore fail, consider warning your contributors about this.
+
 ## Inject App Secrets
 
 You can pass more secrets in your app by setting them in your GitHub repository and listing them in `env` and adding them like this : `<A_SECRET>: ${{ secrets.<A_SECRET> }}`.
