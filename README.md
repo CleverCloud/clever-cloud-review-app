@@ -90,5 +90,5 @@ env:
 ...
 - name: Set evironment variables
   run: |
-    clever env set HUGO_VERSION "$HUGO_VERSION
+    clever env set HUGO_VERSION "$HUGO_VERSION"
 ```
