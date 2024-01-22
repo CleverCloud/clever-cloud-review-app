@@ -61,17 +61,28 @@ Place this script in your repository in `.github/workflows/` and modify the foll
 - `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `clever-tools.json` after installing the CLI (example path on Mac: `~/.config/clever-cloud/clever-tools.json`)
 - `ORGA_ID`: the organisation in which your app is created
 
-Generally speaking, forks won't have access to secrets [from any base repository](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflows-in-forked-repositories-1). This is a GitHub Action security measure and there isn't any way of overriding this using GitHub Actions. **Any pull request from a fork will therefore fail**, consider warning your contributors about this.
+For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions. Follow these steps to do so:
+
+1. Create a new user with a new email adress on Clever Cloud
+2. Create a specific organization for deploying review apps
+3. From your terminal, run `clever logout` and `clever login` right after
+4. Log into the Console with your new user credetials
+5. Get the generated  `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
+
+Repeat steps 1-3 and connect from your main account to set your personal tokens. Your GitHub Acction user's tokens won't be revoked and will be used only from GitHub.
 
 ## Inject App Secrets
 
 You can pass more secrets in your app by setting them in your GitHub repository and listing them in `env` and adding them like this : `<A_SECRET>: ${{ secrets.<A_SECRET> }}`.
 
-Then when injecting environment variables in `Set evironment variables` step, add `clever env set <A_SECRET> ${{env.<A_SECRET>}}`.
+Then when injecting environment variables in `Create and deploy app` step, add `clever env set <A_SECRET> "$<A_SECRET>"`.
+
+For better security, follow this syntax and store the secrets in-memory for each step, to avoid exploits and leaks, instead ouf sourcing them directly in a shell script.
 
 ### Example Script
 
 ```yaml
+step: Create and deploy app
 env:
   ...
   HUGO_VERSION: ${{ secrets.HUGO_VERSION }}
@@ -79,5 +90,5 @@ env:
 ...
 - name: Set evironment variables
   run: |
-    clever env set HUGO_VERSION ${{env.HUGO_VERSION}}
+    clever env set HUGO_VERSION "$HUGO_VERSION
 ```
