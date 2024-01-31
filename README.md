@@ -69,7 +69,7 @@ For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER
 4. Log into the Console with your new user credetials
 5. Get the generated  `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
 
-Repeat steps 1-3 and connect from your main account to set your personal tokens. Your GitHub Acction user's tokens won't be revoked and will be used only from GitHub.
+Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Acction user's tokens won't be revoked and will be used only from GitHub.
 
 ## Inject App Secrets
 
