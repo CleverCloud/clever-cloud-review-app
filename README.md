@@ -20,7 +20,6 @@ The action will consider both branches on the same repository, and pull requests
 Place this script in your repository in `.github/workflows/` and modify the following values:
 
 - `<type>` for the type of app
-- `<app-name>` for the name of your app
 - `region` for where you want the app to be deployed
 - `<VARIABLE_NAME>` and `variable_value` for your environment variables
 

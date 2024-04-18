@@ -47,26 +47,24 @@ jobs:
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           ORGA_ID: ${{ secrets.ORGA_ID }}
       # Use "clever create" to deploy your app.
-      # Replace <type>, <app-name> and <region>
+      # Replace <type> and <region>
         run: | 
-          clever create --type <type> <app-name>-PR-${{ github.event.number }} --alias <app-name>-PR-${{ github.event.number }} --region <region> --org "$ORGA_ID"
+          clever create --type <type> ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region <region> --org "$ORGA_ID"
       # Set environment variable with "clever env set".
       # For example: clever env set CC_WEBROOT "/public"
       # Inject your secrets as well, for ex:
       #clever env set HUGO_VERSION ${{env.HUGO_VERSION}}
           clever env set <VARIABLE_NAME> "<variable_value>"
       # Set review app domain with "clever domain add".
-      # Replace <app-name>
-          clever domain add <app-name>-PR-${{ github.event.number }}.cleverapps.io
+          clever domain add ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io
           clever deploy
       # Post your domain in PR's discussion
-      # Replace <app-name>
       - name: Comment PR
         uses: actions/github-script@v5
         with:
           script: |
             const issue_number = context.payload.pull_request.number;
-            const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://<app-name>-PR-${{ github.event.number }}.cleverapps.io)`;
+            const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -99,17 +97,15 @@ jobs:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           ORGA_ID: ${{ secrets.ORGA_ID }}
-      # Replace <app-name>
         run: | 
-          clever link -o "$ORGA_ID" <app-name>-PR-${{ github.event.number }}
+          clever link -o "$ORGA_ID" ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
           clever deploy
       - name: Comment PR
         uses: actions/github-script@v5
         with:
-        # Replace <app-name>
           script: |
             const issue_number = context.payload.pull_request.number;
-            const message = `🚀 Your app has been updated and is available [here](https://<app-name>-PR-${{ github.event.number }}.cleverapps.io)`;
+            const message = `🚀 Your app has been updated and is available [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -130,10 +126,9 @@ jobs:
       - name: install clever-tools
         run: npm install -g clever-tools
       - name: Delete app
-      # Replace <app-name>
         run: |
-          clever link -o "$ORGA_ID" <app-name>-PR-${{ github.event.number }}
-          clever delete --alias <app-name>-PR-${{ github.event.number }} --yes
+          clever link -o "$ORGA_ID" ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+          clever delete --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --yes
       - name: Comment PR
         uses: actions/github-script@v5
         with:
