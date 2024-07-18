@@ -1,0 +1,45 @@
+on:
+  pull_request_target:
+    types: [opened, closed, synchronize, reopened]
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy/redeploy review app
+    runs-on: ubuntu-latest
+    permissions:
+        issues: write
+        pull-requests: write
+        contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Create review app
+        uses: juliamrch/gh-action-composite@v20
+        env:
+          CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+          CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+          ORGA_ID: ${{ secrets.ORGA_ID }}
+          GH_CC_RUN_SUCCEEDED_HOOK: ${{ secrets.CC_RUN_SUCCEEDED_HOOK }}
+        with:
+          type: 'static-apache'
+          set-env: true
+          environment: 'review'
+      - name: Comment PR
+        uses: actions/github-script@v7
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+        with:
+          script: |
+            const issue_number = context.payload.pull_request.number;
+            const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
+            github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+              issue_number: issue_number,
+              body: message
+              });
