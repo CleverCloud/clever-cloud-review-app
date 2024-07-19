@@ -87,7 +87,7 @@ name: Create review app
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           ORGA_ID: ${{ secrets.ORGA_ID }}
-          GH_CC_RUN_SUCCEEDED_HOOK: ${{ secrets. CC_RUN_SUCCEEDED_HOOK }} # This envrironment variable will be set on Clever Cloud
+          GH_CC_RUN_SUCCEEDED_HOOK: ${{ secrets. CC_RUN_SUCCEEDED_HOOK }} # This environment variable will be set on Clever Cloud
         with:
           type: '<type-of-app>'
           set-env: true # Enables the command to set en vars on Clever Cloud
