@@ -41,7 +41,7 @@ runs:
     - name: Install clever-tools
       shell: bash
       run: npm install -g clever-tools
-    - name: Execute commands based on action
+    - name: Execute commands based on actio
       run: |
         if [ "${{ github.event.action }}" = 'opened' ] || [ "${{ github.event.action }}" = 'reopened' ]; then
           clever create --type ${{ inputs.type }} ${{ inputs.name }} --alias ${{ inputs.alias }} --region ${{ inputs.region }} --org ${{ inputs.organization }}
@@ -64,6 +64,6 @@ runs:
           clever deploy --force
         elif [ "${{ github.event.action }}" = 'closed' ]; then
           clever link -o "$ORGA_ID" ${{ inputs.name }}
-          clever delete --alias ${{ inputs.alias }}
+          clever delete --alias ${{ inputs.alias }} --yes
         fi
       shell: bash
