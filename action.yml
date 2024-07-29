@@ -115,9 +115,7 @@ runs:
     
     - name: Comment PR on deletion
       if: ${{ steps.delete.outcome == 'success' }}
-      uses: actions/github-script@v7
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+      uses: actions/github-script@v7  
       with:
         script: |
           const issue_number = context.payload.pull_request.number;
