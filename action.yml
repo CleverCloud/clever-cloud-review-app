@@ -82,7 +82,7 @@ runs:
         clever delete --alias ${{ inputs.alias }} --yes
     
     - name: Comment PR on app creation
-      if: ${{ needs.deploy.result == 'success' }}
+      if: ${{ steps.deploy.outcome == 'success' }}
       uses: actions/github-script@v7
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
@@ -98,7 +98,7 @@ runs:
               });
 
     - name: Comment PR on app update
-      if: ${{ needs.update.result == 'success' }}
+      if: ${{ steps.update.outcome == 'success' }}
       uses: actions/github-script@v7
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
@@ -114,7 +114,7 @@ runs:
               });
     
     - name: Comment PR on deletion
-      if: ${{ needs.delete.result == 'success' }}
+      if: ${{ steps.delete.outcome == 'success' }}
       uses: actions/github-script@v7
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
