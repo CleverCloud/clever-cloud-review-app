@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
       - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v1.0.0
+        uses: CleverCloud/clever-cloud-review-app@v1.1.0
         env:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
