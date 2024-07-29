@@ -84,8 +84,6 @@ runs:
     - name: Comment PR on app creation
       if: ${{ steps.deploy.outcome == 'success' }}
       uses: actions/github-script@v7
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       with:
         script: |
           const issue_number = context.payload.pull_request.number;
@@ -100,8 +98,6 @@ runs:
     - name: Comment PR on app update
       if: ${{ steps.update.outcome == 'success' }}
       uses: actions/github-script@v7
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       with:
         script: |
           const issue_number = context.payload.pull_request.number;
