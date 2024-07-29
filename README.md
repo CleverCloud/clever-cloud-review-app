@@ -20,7 +20,8 @@ The action will consider both branches on the same repository, and pull requests
 Add the following secrets to your repository, in **Settings > Secrets and variables**:
 
 - `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `clever-tools.json` after installing the CLI (example path on Mac: `~/.config/clever-cloud/clever-tools.json`)
-- `ORGA_ID`: the organisation in which your app is created
+- `ORGA_ID`: the organisation in which your app is create
+- `GITHUB_TOKEN`: implicit, to enable comments on the PR
 
 For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions. Follow these steps to do so:
 
@@ -84,6 +85,7 @@ To inject your app secrets and environment variables on Clever Cloud, add them t
 name: Create review app
         uses: CleverCloud/clever-cloud-review-app@latest
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # To enable comments on the PR
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           ORGA_ID: ${{ secrets.ORGA_ID }}
