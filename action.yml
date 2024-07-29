@@ -27,12 +27,10 @@ inputs:
     default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io
   set-env:
     description: 'Set environment variables'
-    type: boolean
     required: false
-    default: false
+    default: 'false'
   environment:
         description: 'Environment to run tests against'
-        type: environment
         required: true
         default: ''
 runs:
@@ -41,29 +39,92 @@ runs:
     - name: Install clever-tools
       shell: bash
       run: npm install -g clever-tools
-    - name: Execute commands based on actio
-      run: |
-        if [ "${{ github.event.action }}" = 'opened' ] || [ "${{ github.event.action }}" = 'reopened' ]; then
-          clever create --type ${{ inputs.type }} ${{ inputs.name }} --alias ${{ inputs.alias }} --region ${{ inputs.region }} --org ${{ inputs.organization }}
-          clever domain add ${{ inputs.domain }}
-          # Only select environment variables with GH_ prefix
-          # to exclude GitHub runner variables
-          if ${{ inputs.set-env }}; then
-          # Remove prefix from print
-            for var in $(env | awk -F= '/^GH_/ { print $1 }')
-            do
-              real_var=${var#GH_}
-              # Inject variable in the app on Clever Cloud
-              clever env set $real_var "${!var}"
-            done
 
-            clever deploy
-          fi
-        elif [ "${{ github.event.action }}" = 'synchronize' ]; then
-          clever link -o "$ORGA_ID" ${{ inputs.name }}
-          clever deploy --force
-        elif [ "${{ github.event.action }}" = 'closed' ]; then
-          clever link -o "$ORGA_ID" ${{ inputs.name }}
-          clever delete --alias ${{ inputs.alias }} --yes
-        fi
+    - name: Create app
+      if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
+      run: |
+        clever create --type ${{ inputs.type }} ${{ inputs.name }} --alias ${{ inputs.alias }} --region ${{ inputs.region }} --org ${{ inputs.organization }}
+        clever domain add ${{ inputs.domain }}
+      
+    - name: Set environment variables
+      if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' && inputs.set-env }}
+      shell: bash
+      run: |
+       # Remove prefix from print
+       for var in $(env | awk -F= '/^GH_/ { print $1 }')
+       do
+        real_var=${var#GH_}
+        # Inject variable in the app on Clever Cloud
+          clever env set $real_var "${!var}"
+       done
+    
+    - name: Deploy app
+      if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
+      shell: bash
+      id: deploy
+      run: clever deploy
+
+    - name: Update app
+      if: ${{ github.event.action == 'synchronize' }}
+      shell: bash
+      id: update
+      run: |
+        clever link -o "$ORGA_ID" ${{ inputs.name }}
+        clever deploy --force
+    
+    - name: Update app
+      if: ${{ github.event.action == 'closed' }}
+      shell: bash
+      id: delete
+      run: |
+        clever link -o "$ORGA_ID" ${{ inputs.name }}
+        clever delete --alias ${{ inputs.alias }} --yes
+    
+    - name: Comment PR on app creation
+      if: ${{ needs.deploy.result == 'success' }}
+      uses: actions/github-script@v7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+      with:
+        script: |
+          const issue_number = context.payload.pull_request.number;
+          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
+            github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+              issue_number: issue_number,
+              body: message
+              });
+
+    - name: Comment PR on app update
+      if: ${{ needs.update.result == 'success' }}
+      uses: actions/github-script@v7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+      with:
+        script: |
+          const issue_number = context.payload.pull_request.number;
+          const message = `🚀 You updated your review app. Check it [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
+            github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+              issue_number: issue_number,
+              body: message
+              });
+    
+    - name: Comment PR on deletion
+      if: ${{ needs.delete.result == 'success' }}
+      uses: actions/github-script@v7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+      with:
+        script: |
+          const issue_number = context.payload.pull_request.number;
+          const message = `You closed this PR and deleted the review app 👋`;
+            github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+              issue_number: issue_number,
+              body: message
+              });

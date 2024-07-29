@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
       - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v1.0.0
+        uses: juliamrch/gh-action-composite@v1.0.0
         env:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -29,17 +29,3 @@ jobs:
           type: 'static-apache'
           set-env: true
           environment: 'review'
-      - name: Comment PR
-        uses: actions/github-script@v7
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
-        with:
-          script: |
-            const issue_number = context.payload.pull_request.number;
-            const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
-            github.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-              issue_number: issue_number,
-              body: message
-              });
