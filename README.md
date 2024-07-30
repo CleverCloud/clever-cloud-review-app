@@ -33,6 +33,21 @@ For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER
 
 Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Acction user's tokens won't be revoked and will be used only from GitHub.
 
+### Permissions
+
+At job level, set the appropriate permissions to enable comments on PRs:
+
+```yaml
+jobs:
+  deploy:
+    name: Deploy/redeploy review app
+    runs-on: ubuntu-latest
+    permissions:
+        issues: write
+        pull-requests: write
+        contents: read
+```
+
 ## How to Use this Action
 
 1. In your `.github/workflow/review-app.yml`, define the event trigger for running the action:
@@ -53,6 +68,7 @@ on:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           ORGA_ID: ${{ secrets.ORGA_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           type: '<type-of-app>'
 ```
