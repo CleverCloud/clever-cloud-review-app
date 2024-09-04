@@ -76,22 +76,23 @@ on:
 ### Values for `--type`
 
 - `docker`: for Docker-based applications
+- `elixir`: for Elixir-based applications
 - `go`: for Go applications
-- `gradle`: for applications launched with gradle
-- `haskell`: for haskell applications
-- `jar`: for applications deployed as standalone jar files
-- `maven`: for applications launched with maven
+- `gradle`: for applications launched with Gradle
+- `haskell`: for Haskell applications
+- `jar`: for applications deployed as standalone JAR files
+- `maven`: for applications launched with Maven
 - `meteor`: for Meteor applications launched with Node.js
 - `node`: for Node.js applications
 - `php`: for PHP applications
 - `play1`: for Play1 applications
 - `play2`: for Play2 applications
-- `python`: for python27 and python3 applications
-- `ruby`: for ruby applications
-- `rust`: for rust applications
+- `python`: for Python applications
+- `ruby`: for Ruby applications
+- `rust`: for Rust applications
 - `sbt`: for applications launched with SBT
 - `static-apache`: for static (HTML only) websites
-- `war`: for applications deployed as war files
+- `war`: for applications deployed as WAR files
 
 ### Inject secrets and variables
 
@@ -123,10 +124,10 @@ You can override default options by defining `region`, `domain`, `name`, and `al
 ### Values for `--region`
 
 - `par` (Paris, [Clever Cloud](https://www.clever-cloud.com/infrastructure/))
+- `grahds` (Gravelines, HDS servers, OVHcloud)
 - `rbx` (Roubaix, OVHcloud)
 - `rbxhds` (Roubaix, HDS servers, OVHcloud)
 - `scw` (Paris, [Scaleway DC5](https://www.clever-cloud.com/blog/press/2023/01/17/clever-cloud-and-scaleway-join-forces-to-unveil-a-sovereign-european-paas-offering/))
-- `jed` (Jeddah, Oracle Cloud)
 - `mtl` (Montreal, OVHcloud)
 - `sgp` (Singapore, OVHcloud)
 - `syd` (Sydney, OVHcloud)
