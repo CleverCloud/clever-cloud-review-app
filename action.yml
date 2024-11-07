@@ -87,7 +87,7 @@ runs:
       with:
         script: |
           const issue_number = context.payload.pull_request.number;
-          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
+          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})`;
             github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -101,7 +101,7 @@ runs:
       with:
         script: |
           const issue_number = context.payload.pull_request.number;
-          const message = `🚀 You updated your review app. Check it [here](https://${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io)`;
+          const message = `🚀 You updated your review app. Check it [here](https://${{ inputs.domain }})`;
             github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
