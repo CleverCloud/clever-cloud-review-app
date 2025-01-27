@@ -96,7 +96,7 @@ runs:
 
         MODIFIED_FILES_JSON="$(echo "$MODIFIED_FILES" | jq -R . | jq -s . || echo '[]')"
         
-        echo "modified_files=${MODIFIED_FILES_JSON}" >> $GITHUB_OUTPUT
+        echo "modified_files=${MODIFIED_FILES_JSON}"
 
     - name: Comment PR on app creation
       if: ${{ steps.deploy.outcome == 'success' }}
