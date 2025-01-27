@@ -93,8 +93,7 @@ runs:
         HEAD_SHA="${{ github.event.pull_request.head.sha }}"
 
         MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
-
-        MODIFIED_FILES_JSON="$(echo "$MODIFIED_FILES" | jq -R . | jq -s . | xargs || echo '[]')"
+        MODIFIED_FILES_JSON=$(printf "%s" "$MODIFIED_FILES" | jq -R . | jq -s . | xargs || echo '[]')
         
         modified_files="${MODIFIED_FILES_JSON}"
         echo "Modified files: $modified_files"
