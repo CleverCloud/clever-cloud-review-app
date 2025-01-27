@@ -83,51 +83,63 @@ runs:
       run: |
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever delete --alias ${{ inputs.alias }} --yes
-
-    - name: Get modified content files
-      if: ${{ steps.deploy.outcome == 'success' || steps.update.outcome == 'success' }}
-      shell: bash
-      id: get-modified-files
-      run: |
-        BASE_SHA="${{ github.event.pull_request.base.sha }}"
-        HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-
-        MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
-        MODIFIED_FILES_JSON=$(printf "%s" "$MODIFIED_FILES" | jq -R . | jq -s . | xargs || echo '[]')
         
-        modified_files="${MODIFIED_FILES_JSON}"
-        echo "Modified files: $modified_files"
-        echo "modified_files=$modified_files" >> "$GITHUB_OUTPUT"
+- name: Get modified content files
+  if: ${{ steps.deploy.outcome == 'success' || steps.update.outcome == 'success' }}
+  shell: bash
+  id: get-modified-files
+  run: |
+    BASE_SHA="${{ github.event.pull_request.base.sha }}"
+    HEAD_SHA="${{ github.event.pull_request.head.sha }}"
 
-    - name: Comment PR on app creation
-      if: ${{ steps.deploy.outcome == 'success' }}
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+    MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
+
+    MODIFIED_FILES_JSON=$(printf "%s" "$MODIFIED_FILES" | jq -R . | jq -s . | xargs || echo '[]')
+    
+    echo "Modified files JSON: $MODIFIED_FILES_JSON"
+
+    modified_files="${MODIFIED_FILES_JSON}"
+    echo "Modified files: $modified_files"
+    echo "modified_files=$modified_files" >> "$GITHUB_OUTPUT"
+
+- name: Comment PR on app creation
+  if: ${{ steps.deploy.outcome == 'success' }}
+  uses: actions/github-script@v7
+  with:
+    script: |
+      try {
+        const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+        
+        let message = `## 🚀 Review App Deployed\n\n`;
+        message += `### 🔗 App URL\n`;
+        message += `Your app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
+        
+        if (modifiedFiles && modifiedFiles.length > 0) {
+          message += `### 📄 Modified Pages\n`;
+          message += `The following pages were modified in this PR:\n\n`;
           
-          let message = `## 🚀 Review App Deployed\n\n`;
-          message += `### 🔗 App URL\n`;
-          message += `Your app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
-          
-          if (modifiedFiles && modifiedFiles.length > 0) {
-            message += `### 📄 Modified Pages\n`;
-            message += `The following pages were modified in this PR:\n\n`;
+          for (const file of modifiedFiles) {
+            const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
             
-            for (const file of modifiedFiles) {
-              const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
-              let staticUrl = pageUrl.replace(/\/content/g, "");
 
-              message += `- [${file}](${staticUrl})\n`;
-            }
+            const staticUrl = pageUrl.replace(new RegExp(`/${{ inputs['watch-path'] }}`, 'g'), "");
+
+            message += `- [${file}](${staticUrl})\n`;
           }
-          
-          github.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.payload.pull_request.number,
-            body: message
-          });
+        }
+
+        await github.rest.issues.createComment({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          issue_number: context.payload.pull_request.number,
+          body: message
+        });
+
+      } catch (error) {
+        console.error('Error processing modified files or posting comment:', error);
+        throw error;
+      }
+
 
     - name: Comment PR on app update
       if: ${{ steps.update.outcome == 'success' }}
