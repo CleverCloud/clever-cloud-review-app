@@ -89,17 +89,13 @@ runs:
       shell: bash
       id: get-modified-files
       run: |
-        # Get the base and head SHAs
         BASE_SHA="${{ github.event.pull_request.base.sha }}"
         HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-        
-        # Get list of modified files in the specified path
+
         MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
-        
-        # Convert the list to JSON array and escape newlines
+
         MODIFIED_FILES_JSON="$(echo "$MODIFIED_FILES" | jq -R . | jq -s . || echo '[]')"
         
-        # Save to output
         echo "modified_files=${MODIFIED_FILES_JSON}" >> $GITHUB_OUTPUT
 
     - name: Comment PR on app creation
