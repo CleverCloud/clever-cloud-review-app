@@ -1,5 +1,5 @@
 name: 'Clever Cloud review app on PRs'
-description: 'Deploy a review app on Clever Cloud when a PR is opened'
+description: 'Deploy a review app on Clever Cloud when a PR is opened and list modified content pages'
 
 inputs:
   type:  
@@ -30,9 +30,14 @@ inputs:
     required: false
     default: 'false'
   environment:
-        description: 'Environment to run tests against'
-        required: true
-        default: ''
+    description: 'Environment to run tests against'
+    required: true
+    default: ''
+  watch-path:
+    description: 'Path to monitor for changes (e.g., "content/")'
+    required: false
+    default: 'content/'
+
 runs:
   using: "composite"
   steps:
@@ -51,13 +56,11 @@ runs:
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' && inputs.set-env }}
       shell: bash
       run: |
-       # Remove prefix from print
-       for var in $(env | awk -F= '/^GH_/ { print $1 }')
-       do
-        real_var=${var#GH_}
-        # Inject variable in the app on Clever Cloud
+        for var in $(env | awk -F= '/^GH_/ { print $1 }')
+        do
+          real_var=${var#GH_}
           clever env set $real_var "${!var}"
-       done
+        done
     
     - name: Deploy app
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
@@ -80,45 +83,93 @@ runs:
       run: |
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever delete --alias ${{ inputs.alias }} --yes
-    
+
+    - name: Get modified content files
+      if: ${{ steps.deploy.outcome == 'success' || steps.update.outcome == 'success' }}
+      shell: bash
+      id: get-modified-files
+      run: |
+        # Get the base and head SHAs
+        BASE_SHA="${{ github.event.pull_request.base.sha }}"
+        HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+        
+        # Get list of modified files in the specified path
+        MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
+        
+        # Convert the list to JSON array and escape newlines
+        MODIFIED_FILES_JSON="$(echo "$MODIFIED_FILES" | jq -R . | jq -s . || echo '[]')"
+        
+        # Save to output
+        echo "modified_files=${MODIFIED_FILES_JSON}" >> $GITHUB_OUTPUT
+
     - name: Comment PR on app creation
       if: ${{ steps.deploy.outcome == 'success' }}
       uses: actions/github-script@v7
       with:
         script: |
-          const issue_number = context.payload.pull_request.number;
-          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})`;
-            github.rest.issues.createComment({
+          const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+          
+          let message = `## 🚀 Review App Deployed\n\n`;
+          message += `### 🔗 App URL\n`;
+          message += `Your app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
+          
+          if (modifiedFiles && modifiedFiles.length > 0) {
+            message += `### 📄 Modified Pages\n`;
+            message += `The following pages were modified in this PR:\n\n`;
+            
+            for (const file of modifiedFiles) {
+              const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
+              let staticUrl = pageUrl.replace(/\/content/g, "");
+
+              message += `- [${file}](${staticUrl})\n`;
+            }
+          }
+          
+          github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-              issue_number: issue_number,
-              body: message
-              });
+            issue_number: context.payload.pull_request.number,
+            body: message
+          });
 
     - name: Comment PR on app update
       if: ${{ steps.update.outcome == 'success' }}
       uses: actions/github-script@v7
       with:
         script: |
-          const issue_number = context.payload.pull_request.number;
-          const message = `🚀 You updated your review app. Check it [here](https://${{ inputs.domain }})`;
-            github.rest.issues.createComment({
+          const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+          
+          let message = `## 🔄 Review App Updated\n\n`;
+          message += `### 🔗 App URL\n`;
+          message += `Your updated app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
+          
+          if (modifiedFiles && modifiedFiles.length > 0) {
+            message += `### 📄 Modified Pages\n`;
+            message += `The following pages were modified in this update:\n\n`;
+            
+            for (const file of modifiedFiles) {
+              const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
+              message += `- [${file}](${pageUrl})\n`;
+            }
+          }
+          
+          github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-              issue_number: issue_number,
-              body: message
-              });
+            issue_number: context.payload.pull_request.number,
+            body: message
+          });
     
     - name: Comment PR on deletion
       if: ${{ steps.delete.outcome == 'success' }}
       uses: actions/github-script@v7  
       with:
         script: |
-          const issue_number = context.payload.pull_request.number;
-          const message = `You closed this PR and deleted the review app 👋`;
-            github.rest.issues.createComment({
+          const message = `## 👋 Review App Deleted\n\nThis PR has been closed and the review app has been deleted.`;
+          
+          github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-              issue_number: issue_number,
-              body: message
-              });
+            issue_number: context.payload.pull_request.number,
+            body: message
+          });
