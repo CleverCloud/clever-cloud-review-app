@@ -31760,28 +31760,27 @@ function run() {
             const cleverToken = process.env.CLEVER_TOKEN;
             const cleverSecret = process.env.CLEVER_SECRET;
             const orgaId = process.env.ORGA_ID;
-            //const githubToken = process.env.GITHUB_TOKEN;
-            if (!cleverToken || !cleverSecret || !orgaId) {
+            const githubToken = process.env.GITHUB_TOKEN;
+            if (!cleverToken || !cleverSecret || !orgaId || !githubToken) {
                 throw new Error('Missing required environment variables');
             }
-            // Execute clever-tools commands
-            yield exec.exec('node', ['--input-type=module', cleverTools, 'login', '--token', process.env.CLEVER_TOKEN, '--secret', process.env.CLEVER_SECRET]);
-            yield exec.exec('node', ['--input-type=module', cleverTools, 'create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID]);
-            yield exec.exec('node', ['--input-type=module', cleverTools, 'domain', 'add', domain]);
-            yield exec.exec('node', ['--input-type=module', cleverTools, 'alias', alias]);
+            // Execute clever-tools commands with esm loader
+            yield exec.exec('node', ['-r', 'esm', cleverTools, 'login', '--token', cleverToken, '--secret', cleverSecret]);
+            yield exec.exec('node', ['-r', 'esm', cleverTools, 'create', name, '--type', appType, '--region', region, '--org', orgaId]);
+            yield exec.exec('node', ['-r', 'esm', cleverTools, 'domain', 'add', domain]);
+            yield exec.exec('node', ['-r', 'esm', cleverTools, 'alias', name, alias]);
             if (setEnv) {
-                // Set environment variables
-                Object.keys(process.env).forEach(key => {
+                for (const key of Object.keys(process.env)) {
                     if (key.startsWith('GH_')) {
                         const envVarName = key.slice(3);
-                        exec.exec('node', ['--input-type=module', cleverTools, 'env', 'set', envVarName, process.env[key]]);
+                        yield exec.exec('node', ['-r', 'esm', cleverTools, 'env', 'set', envVarName, process.env[key]]);
                     }
-                });
+                }
             }
             // Deploy the app
-            yield exec.exec('node', ['--input-type=module', cleverTools, 'deploy', '--force']);
+            yield exec.exec('node', ['-r', 'esm', cleverTools, 'deploy', '--force']);
             // Post comment with review app link
-            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            const octokit = github.getOctokit(githubToken);
             yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body: `Review app deployed: https://${domain}` }));
             core.setOutput('app_url', `https://${domain}`);
         }
