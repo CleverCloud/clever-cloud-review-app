@@ -31765,21 +31765,21 @@ function run() {
                 throw new Error('Missing required environment variables');
             }
             // Execute clever-tools commands
-            yield exec.exec(cleverTools, ['login', '--token', process.env.CLEVER_TOKEN, '--secret', process.env.CLEVER_SECRET]);
-            yield exec.exec(cleverTools, ['create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID]);
-            yield exec.exec(cleverTools, ['domain', 'add', domain]);
-            yield exec.exec(cleverTools, ['alias', alias]);
+            yield exec.exec('node', ['--input-type=module', cleverTools, 'login', '--token', process.env.CLEVER_TOKEN, '--secret', process.env.CLEVER_SECRET]);
+            yield exec.exec('node', ['--input-type=module', cleverTools, 'create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID]);
+            yield exec.exec('node', ['--input-type=module', cleverTools, 'domain', 'add', domain]);
+            yield exec.exec('node', ['--input-type=module', cleverTools, 'alias', alias]);
             if (setEnv) {
                 // Set environment variables
                 Object.keys(process.env).forEach(key => {
                     if (key.startsWith('GH_')) {
                         const envVarName = key.slice(3);
-                        exec.exec(cleverTools, ['env', 'set', envVarName, process.env[key]]);
+                        exec.exec('node', ['--input-type=module', cleverTools, 'env', 'set', envVarName, process.env[key]]);
                     }
                 });
             }
             // Deploy the app
-            yield exec.exec(cleverTools, ['deploy', '--force']);
+            yield exec.exec('node', ['--input-type=module', cleverTools, 'deploy', '--force']);
             // Post comment with review app link
             const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
             yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body: `Review app deployed: https://${domain}` }));
