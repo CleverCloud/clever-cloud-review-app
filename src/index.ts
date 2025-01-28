@@ -1,9 +1,11 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as exec from '@actions/exec';
+import * as path from 'path';
 
 async function run(): Promise<void> {
   try {
+    const cleverTools = path.join(__dirname, '..', 'node_modules', '.bin', 'clever');
     // Get inputs
     const appType = core.getInput('type', { required: true });
     const setEnv = core.getInput('set-env') === 'true';
@@ -22,23 +24,23 @@ async function run(): Promise<void> {
     }
 
     // Execute clever-tools commands
-    await exec.exec('clever', ['login', '--token', process.env.CLEVER_TOKEN!, '--secret', process.env.CLEVER_SECRET!]);
-    await exec.exec('clever', ['create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID!]);
-    await exec.exec('clever', ['domain', 'add', domain]);
-    await exec.exec('clever', ['alias', alias]);
+    await exec.exec(cleverTools, ['login', '--token', process.env.CLEVER_TOKEN!, '--secret', process.env.CLEVER_SECRET!]);
+    await exec.exec(cleverTools, ['create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID!]);
+    await exec.exec(cleverTools, ['domain', 'add', domain]);
+    await exec.exec(cleverTools, ['alias', alias]);
 
     if (setEnv) {
       // Set environment variables
       Object.keys(process.env).forEach(key => {
         if (key.startsWith('GH_')) {
           const envVarName = key.slice(3);
-          exec.exec('clever', ['env', 'set', envVarName, process.env[key]!]);
+          exec.exec(cleverTools, ['env', 'set', envVarName, process.env[key]!]);
         }
       });
     }
 
     // Deploy the app
-    await exec.exec('clever', ['deploy', '--force']);
+    await exec.exec(cleverTools, ['deploy', '--force']);
 
     // Post comment with review app link
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
