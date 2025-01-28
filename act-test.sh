@@ -1,0 +1,1 @@
+act pull_request_target --container-architecture linux/amd64
