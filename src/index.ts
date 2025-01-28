@@ -2,9 +2,6 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as exec from '@actions/exec';
 import path from 'node:path';
-import esm from 'esm';
-
-const require = esm(module);
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -41,22 +38,22 @@ async function run(): Promise<void> {
     }
 
     // Execute clever-tools commands with esm loader
-    await exec.exec('node', ['--require=esm', cleverTools, 'login', '--token', cleverToken, '--secret', cleverSecret]);
-    await exec.exec('node', ['--require=esm', cleverTools, 'create', name, '--type', appType, '--region', region, '--org', orgaId]);
-    await exec.exec('node', ['--require=esm', cleverTools, 'domain', 'add', domain]);
-    await exec.exec('node', ['--require=esm', cleverTools, 'alias', name, alias]);
+    await exec.exec('node', [cleverTools, 'login', '--token', cleverToken, '--secret', cleverSecret]);
+    await exec.exec('node', [cleverTools, 'create', name, '--type', appType, '--region', region, '--org', orgaId]);
+    await exec.exec('node', [cleverTools, 'domain', 'add', domain]);
+    await exec.exec('node', [cleverTools, 'alias', name, alias]);
 
     if (setEnv) {
       for (const key of Object.keys(process.env)) {
         if (key.startsWith('GH_')) {
           const envVarName = key.slice(3);
-          await exec.exec('node', ['--require=esm', cleverTools, 'env', 'set', envVarName, process.env[key]!]);
+          await exec.exec('node', [cleverTools, 'env', 'set', envVarName, process.env[key]!]);
         }
       }
     }
 
     // Deploy the app
-    await exec.exec('node', ['--require=esm', cleverTools, 'deploy', '--force']);
+    await exec.exec('node', [cleverTools, 'deploy', '--force']);
 
     // Post comment with review app link
     const octokit = github.getOctokit(githubToken);

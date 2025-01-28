@@ -16,8 +16,7 @@
     "@actions/core": "^1.11.1",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
-    "clever-tools": "^3.7.0",
-    "esm": "^3.2.25"
+    "clever-tools": "^3.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.12.0",
