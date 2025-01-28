@@ -1,0 +1,24 @@
+{
+  "name": "clever-cloud-review-app",
+  "version": "1.0.0",
+  "description": "This GitHub Action does the following",
+  "main": "action.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "package": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.3"
+  }
+}
