@@ -7324,6 +7324,14 @@ exports.Deprecation = Deprecation;
 
 /***/ }),
 
+/***/ 5384:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/* module decorator */ module = __nccwpck_require__.nmd(module);
+const e=(function(){return this||Function("return this")()})(),{apply:t,defineProperty:n}=Reflect,{freeze:r}=Object,{hasOwnProperty:l}=Object.prototype,o=Symbol.for,{type:i,versions:u}=process,{filename:a,id:s,parent:c}=module,_=x(u,"electron"),p=_&&"renderer"===i;let d="";"string"==typeof s&&s.startsWith("internal/")&&(d=q("internal/esm/loader"));const f=__nccwpck_require__(3339),{Script:m}=__nccwpck_require__(9154),{createCachedData:y,runInNewContext:h,runInThisContext:b}=m.prototype,{sep:g}=__nccwpck_require__(6928),{readFileSync:v}=__nccwpck_require__(9896),w=new f(s);function q(e){let t;try{const{internalBinding:n}=__nccwpck_require__(8428),r=n("natives");x(r,e)&&(t=r[e])}catch(e){}return"string"==typeof t?t:""}function x(e,n){return null!=e&&t(l,e,[n])}function D(){return M(__WEBPACK_EXTERNAL_createRequire(import.meta.url),w,T),w.exports}function O(e,t){return D()(e,t)}function j(e,t){try{return v(e,t)}catch(e){}return null}let C,F;w.filename=a,w.parent=c;let I="",S="";""!==d?(S=d,F={__proto__:null,filename:"esm.js"}):(I=__dirname+g+"node_modules"+g+".cache"+g+"esm",C=j(I+g+".data.blob"),S=j(__nccwpck_require__.ab + "loader.js","utf8"),null===C&&(C=void 0),null===S&&(S=""),F={__proto__:null,cachedData:C,filename:a,produceCachedData:"function"!=typeof y});const k=new m("const __global__ = this;(function (require, module, __shared__) { "+S+"\n});",F);let M,T;if(M=p?t(b,k,[{__proto__:null,filename:a}]):t(h,k,[{__proto__:null,global:e},{__proto__:null,filename:a}]),T=D(),""!==I){const{dir:e}=T.package;let t=e.get(I);if(void 0===t){let n=C;void 0===n&&(n=null),t={buffer:C,compile:new Map([["esm",{circular:0,code:null,codeWithTDZ:null,filename:null,firstAwaitOutsideFunction:null,firstReturnOutsideFunction:null,mtime:-1,scriptData:n,sourceType:1,transforms:0,yieldIndex:-1}]]),meta:new Map},e.set(I,t)}const{pendingScripts:n}=T;let r=n.get(I);void 0===r&&(r=new Map,n.set(I,r)),r.set("esm",k)}n(O,T.symbol.package,{__proto__:null,value:!0}),n(O,T.customInspectKey,{__proto__:null,value:()=>"esm enabled"}),n(O,o("esm:package"),{__proto__:null,value:!0}),r(O),module.exports=O;
+
+/***/ }),
+
 /***/ 5560:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -29813,6 +29821,14 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 8428:
+/***/ ((module) => {
+
+module.exports = eval("require")("internal/bootstrap/loaders");
+
+
+/***/ }),
+
 /***/ 2613:
 /***/ ((module) => {
 
@@ -29894,6 +29910,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("http2");
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("https");
+
+/***/ }),
+
+/***/ 3339:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("module");
 
 /***/ }),
 
@@ -30013,6 +30036,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("util");
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("util/types");
+
+/***/ }),
+
+/***/ 9154:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("vm");
 
 /***/ }),
 
@@ -31657,8 +31687,8 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	// Create a new module (and put it into the cache)
 /******/ 	var module = __webpack_module_cache__[moduleId] = {
-/******/ 		// no module.id needed
-/******/ 		// no module.loaded needed
+/******/ 		id: moduleId,
+/******/ 		loaded: false,
 /******/ 		exports: {}
 /******/ 	};
 /******/ 
@@ -31670,6 +31700,9 @@ module.exports = parseParams
 /******/ 	} finally {
 /******/ 		if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 	}
+/******/ 
+/******/ 	// Flag the module as loaded
+/******/ 	module.loaded = true;
 /******/ 
 /******/ 	// Return the exports of the module
 /******/ 	return module.exports;
@@ -31705,6 +31738,15 @@ module.exports = parseParams
 /******/ 	__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ })();
 /******/ 
+/******/ /* webpack/runtime/node module decorator */
+/******/ (() => {
+/******/ 	__nccwpck_require__.nmd = (module) => {
+/******/ 		module.paths = [];
+/******/ 		if (!module.children) module.children = [];
+/******/ 		return module;
+/******/ 	};
+/******/ })();
+/******/ 
 /******/ /* webpack/runtime/compat */
 /******/ 
 /******/ if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = new URL('.', import.meta.url).pathname.slice(import.meta.url.match(/^file:\/\/\/\w:/) ? 1 : 0, -1) + "/";
@@ -31712,6 +31754,8 @@ module.exports = parseParams
 /************************************************************************/
 var __webpack_exports__ = {};
 
+// EXTERNAL MODULE: ./node_modules/esm/esm.js
+var esm = __nccwpck_require__(5384);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(7484);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
@@ -31733,6 +31777,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -31765,20 +31810,20 @@ function run() {
                 throw new Error('Missing required environment variables');
             }
             // Execute clever-tools commands with esm loader
-            yield exec.exec('node', ['-r', 'esm', cleverTools, 'login', '--token', cleverToken, '--secret', cleverSecret]);
-            yield exec.exec('node', ['-r', 'esm', cleverTools, 'create', name, '--type', appType, '--region', region, '--org', orgaId]);
-            yield exec.exec('node', ['-r', 'esm', cleverTools, 'domain', 'add', domain]);
-            yield exec.exec('node', ['-r', 'esm', cleverTools, 'alias', name, alias]);
+            yield exec.exec('node', ['--require=esm', cleverTools, 'login', '--token', cleverToken, '--secret', cleverSecret]);
+            yield exec.exec('node', ['--require=esm', cleverTools, 'create', name, '--type', appType, '--region', region, '--org', orgaId]);
+            yield exec.exec('node', ['--require=esm', cleverTools, 'domain', 'add', domain]);
+            yield exec.exec('node', ['--require=esm', cleverTools, 'alias', name, alias]);
             if (setEnv) {
                 for (const key of Object.keys(process.env)) {
                     if (key.startsWith('GH_')) {
                         const envVarName = key.slice(3);
-                        yield exec.exec('node', ['-r', 'esm', cleverTools, 'env', 'set', envVarName, process.env[key]]);
+                        yield exec.exec('node', ['--require=esm', cleverTools, 'env', 'set', envVarName, process.env[key]]);
                     }
                 }
             }
             // Deploy the app
-            yield exec.exec('node', ['-r', 'esm', cleverTools, 'deploy', '--force']);
+            yield exec.exec('node', ['--require=esm', cleverTools, 'deploy', '--force']);
             // Post comment with review app link
             const octokit = github.getOctokit(githubToken);
             yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body: `Review app deployed: https://${domain}` }));
