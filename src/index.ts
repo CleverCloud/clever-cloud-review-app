@@ -2,6 +2,9 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as exec from '@actions/exec';
 import path from 'node:path';
+import esm from 'esm';
+
+const require = esm(module);
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
