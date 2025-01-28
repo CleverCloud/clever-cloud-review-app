@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "ncc build src/index.ts -o dist"
+    "build": "tsc",
+    "build-ts": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -15,12 +16,10 @@
     "@actions/core": "^1.11.1",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
-    "clever-tools": "^3.7.0",
-    "esm": "^3.2.25"
+    "clever-tools": "^3.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.12.0",
-    "@vercel/ncc": "^0.38.3",
     "typescript": "^5.7.3"
   }
 }

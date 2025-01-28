@@ -1,11 +1,9 @@
-import 'esm';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as exec from '@actions/exec';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 async function run(): Promise<void> {
   try {
@@ -17,15 +15,18 @@ async function run(): Promise<void> {
     const domain = core.getInput('domain');
     const name = core.getInput('name');
     const alias = core.getInput('alias');
+    
+    // Log the GitHub context payload for debugging
+    console.log('GitHub Context Payload:', github.context.payload);
 
-    // Get PR details
-    const { pull_request } = github.context.payload;
-    const prNumber = pull_request?.number;
-    const repoName = github.context.repo.repo;
+    const { pull_request } = github.context.payload || {};
 
-    if (!prNumber) {
+    if (!pull_request || !pull_request.number) {
       throw new Error('This action can only be run on pull requests');
     }
+
+    const prNumber = pull_request.number;
+    const repoName = github.context.repo.repo;
 
     const cleverToken = process.env.CLEVER_TOKEN;
     const cleverSecret = process.env.CLEVER_SECRET;

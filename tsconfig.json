@@ -1,15 +1,14 @@
 {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "NodeNext",
-      "moduleResolution": "nodenext",
-      "outDir": "dist",
-      "rootDir": "src",
-      "strict": true,
+  "compilerOptions": {
+      "module": "ESNext", // Use ESNext for ES module syntax
+      "target": "ESNext", // Set target to ESNext or a specific version like ES2020
+      "moduleResolution": "Node",
       "esModuleInterop": true,
       "skipLibCheck": true,
-       "forceConsistentCasingInFileNames": true
-     },
-     "include": ["src"]
-   }
-  
+      "forceConsistentCasingInFileNames": true,
+      "outDir": ".", // Specify output directory
+      "rootDir": "./src"  // Specify root directory for input files
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
