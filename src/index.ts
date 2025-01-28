@@ -22,17 +22,17 @@ async function run(): Promise<void> {
     }
 
     // Execute clever-tools commands
-    await exec.exec('clever', ['login', '--token', process.env.CLEVER_TOKEN!, '--secret', process.env.CLEVER_SECRET!]);
-    await exec.exec('clever', ['create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID!]);
-    await exec.exec('clever', ['domain', 'add', domain]);
-    await exec.exec('clever', ['alias', alias]);
+    await exec.exec('npx', ['clever', 'login', '--token', process.env.CLEVER_TOKEN!, '--secret', process.env.CLEVER_SECRET!]);
+    await exec.exec('npx', ['clever', 'create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID!]);
+    await exec.exec('npx', ['clever', 'domain', 'add', domain]);
+    await exec.exec('npx', ['clever', 'alias', alias]);
 
     if (setEnv) {
       // Set environment variables
       Object.keys(process.env).forEach(key => {
         if (key.startsWith('GH_')) {
           const envVarName = key.slice(3);
-          exec.exec('clever', ['env', 'set', envVarName, process.env[key]!]);
+          exec.exec('npx', ['clever', 'env', 'set', envVarName, process.env[key]!]);
         }
       });
     }
