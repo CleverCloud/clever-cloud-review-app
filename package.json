@@ -5,8 +5,7 @@
   "main": "action.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "package": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js"
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.12.0",
-    "clever-tools": "^3.11.0",
+    "clever-tools": "^3.7.0",
     "esbuild": "^0.24.2",
     "typescript": "^5.7.3"
   }
