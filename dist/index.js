@@ -23873,10 +23873,10 @@ var require_github = __commonJS({
 });
 
 // src/index.ts
-var core = __toESM(require_core(), 1);
-var github = __toESM(require_github(), 1);
-var exec = __toESM(require_exec(), 1);
-var path = __toESM(require("path"), 1);
+var core = __toESM(require_core());
+var github = __toESM(require_github());
+var exec = __toESM(require_exec());
+var path = __toESM(require("path"));
 async function run() {
   try {
     const cleverTools = path.join(__dirname, "..", "node_modules", ".bin", "clever");
