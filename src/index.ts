@@ -3,6 +3,8 @@ import * as github from '@actions/github';
 import * as exec from '@actions/exec';
 import * as path from 'path';
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 async function run(): Promise<void> {
   try {
     const cleverTools = path.join(__dirname, '..', 'node_modules', '.bin', 'clever');
