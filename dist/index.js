@@ -31711,14 +31711,19 @@ module.exports = parseParams
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(5236);
-/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_actions_exec__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6928);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__nccwpck_require__.n(path__WEBPACK_IMPORTED_MODULE_3__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7484);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3228);
+// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
+var exec = __nccwpck_require__(5236);
+;// CONCATENATED MODULE: external "node:url"
+const external_node_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
+;// CONCATENATED MODULE: external "node:path"
+const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
+var external_node_path_default = /*#__PURE__*/__nccwpck_require__.n(external_node_path_namespaceObject);
+;// CONCATENATED MODULE: ./src/index.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -31732,52 +31737,60 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const __dirname = path__WEBPACK_IMPORTED_MODULE_3__.dirname(new URL(import.meta.url).pathname);
+
+const src_dirname = external_node_path_default().dirname((0,external_node_url_namespaceObject.fileURLToPath)(import.meta.url));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const cleverTools = __nccwpck_require__.ab + "clever";
+            const cleverTools = external_node_path_default().join(src_dirname, '..', 'node_modules', '.bin', 'clever');
             // Get inputs
-            const appType = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('type', { required: true });
-            const setEnv = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('set-env') === 'true';
-            const region = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('region');
-            const domain = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('domain');
-            const name = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('name');
-            const alias = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('alias');
+            const appType = core.getInput('type', { required: true });
+            const setEnv = core.getInput('set-env') === 'true';
+            const region = core.getInput('region');
+            const domain = core.getInput('domain');
+            const name = core.getInput('name');
+            const alias = core.getInput('alias');
             // Get PR details
-            const { pull_request } = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload;
+            const { pull_request } = github.context.payload;
             const prNumber = pull_request === null || pull_request === void 0 ? void 0 : pull_request.number;
-            const repoName = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo;
+            const repoName = github.context.repo.repo;
             if (!prNumber) {
                 throw new Error('This action can only be run on pull requests');
             }
+            const cleverToken = process.env.CLEVER_TOKEN;
+            const cleverSecret = process.env.CLEVER_SECRET;
+            const orgaId = process.env.ORGA_ID;
+            //const githubToken = process.env.GITHUB_TOKEN;
+            if (!cleverToken || !cleverSecret || !orgaId) {
+                throw new Error('Missing required environment variables');
+            }
             // Execute clever-tools commands
-            yield _actions_exec__WEBPACK_IMPORTED_MODULE_2__.exec(__nccwpck_require__.ab + "clever", ['login', '--token', process.env.CLEVER_TOKEN, '--secret', process.env.CLEVER_SECRET]);
-            yield _actions_exec__WEBPACK_IMPORTED_MODULE_2__.exec(__nccwpck_require__.ab + "clever", ['create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID]);
-            yield _actions_exec__WEBPACK_IMPORTED_MODULE_2__.exec(__nccwpck_require__.ab + "clever", ['domain', 'add', domain]);
-            yield _actions_exec__WEBPACK_IMPORTED_MODULE_2__.exec(__nccwpck_require__.ab + "clever", ['alias', alias]);
+            yield exec.exec(cleverTools, ['login', '--token', process.env.CLEVER_TOKEN, '--secret', process.env.CLEVER_SECRET]);
+            yield exec.exec(cleverTools, ['create', name, '--type', appType, '--region', region, '--org', process.env.ORGA_ID]);
+            yield exec.exec(cleverTools, ['domain', 'add', domain]);
+            yield exec.exec(cleverTools, ['alias', alias]);
             if (setEnv) {
                 // Set environment variables
                 Object.keys(process.env).forEach(key => {
                     if (key.startsWith('GH_')) {
                         const envVarName = key.slice(3);
-                        _actions_exec__WEBPACK_IMPORTED_MODULE_2__.exec(__nccwpck_require__.ab + "clever", ['env', 'set', envVarName, process.env[key]]);
+                        exec.exec(cleverTools, ['env', 'set', envVarName, process.env[key]]);
                     }
                 });
             }
             // Deploy the app
-            yield _actions_exec__WEBPACK_IMPORTED_MODULE_2__.exec(__nccwpck_require__.ab + "clever", ['deploy', '--force']);
+            yield exec.exec(cleverTools, ['deploy', '--force']);
             // Post comment with review app link
-            const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(process.env.GITHUB_TOKEN);
-            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo), { issue_number: prNumber, body: `Review app deployed: https://${domain}` }));
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('app_url', `https://${domain}`);
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body: `Review app deployed: https://${domain}` }));
+            core.setOutput('app_url', `https://${domain}`);
         }
         catch (error) {
             if (error instanceof Error) {
-                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+                core.setFailed(error.message);
             }
             else {
-                _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('An unknown error occurred');
+                core.setFailed('An unknown error occurred');
             }
         }
     });

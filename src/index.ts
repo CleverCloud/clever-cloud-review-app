@@ -1,9 +1,10 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as exec from '@actions/exec';
-import * as path from 'path';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function run(): Promise<void> {
   try {
@@ -24,6 +25,15 @@ async function run(): Promise<void> {
     if (!prNumber) {
       throw new Error('This action can only be run on pull requests');
     }
+
+    const cleverToken = process.env.CLEVER_TOKEN;
+    const cleverSecret = process.env.CLEVER_SECRET;
+    const orgaId = process.env.ORGA_ID;
+    //const githubToken = process.env.GITHUB_TOKEN;
+
+    if (!cleverToken || !cleverSecret || !orgaId ) {
+    throw new Error('Missing required environment variables');
+}
 
     // Execute clever-tools commands
     await exec.exec(cleverTools, ['login', '--token', process.env.CLEVER_TOKEN!, '--secret', process.env.CLEVER_SECRET!]);
