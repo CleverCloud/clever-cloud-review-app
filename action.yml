@@ -36,25 +36,21 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # Create comment on PR
     - name: Create comment
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       uses: peter-evans/create-or-update-comment@v4
       id: cc
       with:
         issue-number: ${{ github.event.number }}
-        body: |
-          This is a multi-line test comment
-          - With GitHub **Markdown** :sparkles:
-          - Created by [create-or-update-comment][1]
+        body-path: comments/start.md
 
-          :sparkles: Thanks for contributing to the Clever Cloud documentation! :sparkles:
-          
-          Please wait while your review app is deploying.
-
+    # Install CLI 
     - name: Install clever-tools
       shell: bash
       run: npm install -g clever-tools
-
+    
+    # On PR opening, create app
     - name: Create app
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
@@ -79,8 +75,8 @@ runs:
       shell: bash
       id: deploy
       run: clever deploy
-    
-    - name: Deploy comment
+    # Update comment
+    - name: Comment PR
       if: ${{ steps.deploy.outcome == 'success' }}
       uses: peter-evans/create-or-update-comment@v4
       id: deploy-c
@@ -88,13 +84,10 @@ runs:
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.cc.outputs.comment-id }}
-        body: |
-          
-          Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})
-
-          [1]: https://github.com/peter-evans/create-or-update-comment
+        body-path: comments/deploy.md
         reactions: rocket
 
+    # On new pushes on the PR
     - name: Update app
       if: ${{ github.event.action == 'synchronize' }}
       shell: bash
@@ -102,6 +95,7 @@ runs:
       run: |
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever deploy --force
+    # Update comment    
     - name: Find Comment
       uses: peter-evans/find-comment@v3
       id: fc
@@ -117,9 +111,7 @@ runs:
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
-        body: |
-          
-          Your app has been updated, check it [here](https://${{ inputs.domain }})
+        body-path: comments/deploy.md
         reactions: rocket
     
     - name: Delete app
