@@ -86,6 +86,7 @@ runs:
         comment-id: ${{ steps.cc.outputs.comment-id }}
         body-path: comments/deploy.md
         reactions: rocket
+        edit-mode: replace
 
     # On new pushes on the PR
     - name: Update app
@@ -113,6 +114,7 @@ runs:
         comment-id: ${{ steps.fc.outputs.comment-id }}
         body-path: comments/deploy.md
         reactions: rocket
+        edit-mode: replace
     
     - name: Delete app
       if: ${{ github.event.action == 'closed' }}
