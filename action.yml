@@ -102,7 +102,7 @@ runs:
           | ℹ️ Name              | 🔗 Infos & links                             |
           | -------------------- | ---------------------------------------------|
           | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }}    |
-          | 👁️ Preview           | [${{ inputs.domain }}](${{ inputs.domain }}) |
+          | 👁️ Preview           | https://${{ inputs.domain }}                |
 
         reactions: rocket
         edit-mode: replace
@@ -140,7 +140,7 @@ runs:
           | ℹ️ Name              | 🔗 Infos & links                             |
           | -------------------- | ---------------------------------------------|
           | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }}    |
-          | 👁️ Preview           | [${{ inputs.domain }}](${{ inputs.domain }}) |
+          | 👁️ Preview           | https://${{ inputs.domain }}                 |
 
         reactions: rocket
         edit-mode: replace
