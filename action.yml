@@ -79,10 +79,11 @@ runs:
       id: deploy
       run: clever deploy
     
-    - name: Update comment
+    - name: Deploy comment
       if: ${{ steps.deploy.outcome == 'success' }}
       uses: peter-evans/create-or-update-comment@v4
       id: deploy-c
+      continue-on-error: true
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.cc.outputs.comment-id }}
@@ -92,7 +93,6 @@ runs:
 
           [1]: https://github.com/peter-evans/create-or-update-comment
         reactions: rocket
-        continue-on-error: true
 
     - name: Update app
       if: ${{ github.event.action == 'synchronize' }}
@@ -101,6 +101,20 @@ runs:
       run: |
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever deploy --force
+    - name: Update comment
+      if: ${{ steps.deploy.outcome == 'success' }}
+      uses: peter-evans/create-or-update-comment@v4
+      id: deploy-c
+      continue-on-error: true
+      with:
+        issue-number: ${{ github.event.number }}
+        comment-id: ${{ steps.cc.outputs.comment-id }}
+        body: |
+          
+          Your app has been updated, check it [here](https://${{ inputs.domain }})
+
+          [1]: https://github.com/peter-evans/create-or-update-comment
+        reactions: rocket
     
     - name: Update app
       if: ${{ github.event.action == 'closed' }}
