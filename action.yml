@@ -81,19 +81,32 @@ runs:
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever delete --alias ${{ inputs.alias }} --yes
     
-    - name: Comment PR on app creation
-      if: ${{ steps.deploy.outcome == 'success' }}
-      uses: actions/github-script@v7
+    - name: Create comment
+      uses: peter-evans/create-or-update-comment@v4
       with:
-        script: |
-          const issue_number = context.payload.pull_request.number;
-          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})`;
-            github.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-              issue_number: issue_number,
-              body: message
-              });
+        issue-number: ${{ github.event.number }}
+        body: |
+          This is a multi-line test comment
+          - With GitHub **Markdown** :sparkles:
+          - Created by [create-or-update-comment][1]
+
+          Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})
+
+          [1]: https://github.com/peter-evans/create-or-update-comment
+          reactions: '+1'
+#    - name: Comment PR on app creation
+#      if: ${{ steps.deploy.outcome == 'success' }}
+#      uses: actions/github-script@v7
+#      with:
+#        script: |
+#          const issue_number = context.payload.pull_request.number;
+#          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})`;
+#            github.rest.issues.createComment({
+#            owner: context.repo.owner,
+#            repo: context.repo.repo,
+#              issue_number: issue_number,
+#              body: message
+#              });
 
     - name: Comment PR on app update
       if: ${{ steps.update.outcome == 'success' }}
