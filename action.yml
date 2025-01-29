@@ -84,13 +84,15 @@ runs:
       uses: peter-evans/create-or-update-comment@v4
       id: deploy-c
       with:
-        issue-number: ${{ steps.cc.outputs.comment-id }}
+        issue-number: ${{ github.event.number }}
+        comment-id: ${{ steps.cc.outputs.comment-id }}
         body: |
           
           Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})
 
           [1]: https://github.com/peter-evans/create-or-update-comment
         reactions: rocket
+        continue-on-error: true
 
     - name: Update app
       if: ${{ github.event.action == 'synchronize' }}
