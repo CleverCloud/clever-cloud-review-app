@@ -37,6 +37,7 @@ runs:
   using: "composite"
   steps:
     - name: Create comment
+      if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       uses: peter-evans/create-or-update-comment@v4
       id: cc
       with:
@@ -102,7 +103,7 @@ runs:
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever deploy --force
     - name: Update comment
-      if: ${{ steps.deploy.outcome == 'success' }}
+      if: ${{ steps.update.outcome == 'success' }}
       uses: peter-evans/create-or-update-comment@v4
       id: update-c
       continue-on-error: true
@@ -116,7 +117,7 @@ runs:
           [1]: https://github.com/peter-evans/create-or-update-comment
         reactions: rocket
     
-    - name: Update app
+    - name: Delete app
       if: ${{ github.event.action == 'closed' }}
       shell: bash
       id: delete
