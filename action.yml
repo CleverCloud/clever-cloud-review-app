@@ -95,14 +95,14 @@ runs:
         comment-id: ${{ steps.cc.outputs.comment-id }}
         body: |
           
-          ### :octocat: Preview is deploying...
+          ### ✅ Review app deployed
 
-          Please wait while the preview is deploying on Clever Cloud...
+          Check how your changes look like!
 
-          | ℹ️ Name              | 🔗 Infos & links                           |
-          | --------------------| ------------------------------------------|
-          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }} |
-          | 👁️ Preview           |  **Generating preview app...**            |
+          | ℹ️ Name              | 🔗 Infos & links                             |
+          | -------------------- | ---------------------------------------------|
+          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }}    |
+          | 👁️ Preview           | [${{ inputs.domain }}](${{ inputs.domain }}) |
 
         reactions: rocket
         edit-mode: replace
