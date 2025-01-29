@@ -104,7 +104,7 @@ runs:
     - name: Update comment
       if: ${{ steps.deploy.outcome == 'success' }}
       uses: peter-evans/create-or-update-comment@v4
-      id: deploy-c
+      id: update-c
       continue-on-error: true
       with:
         issue-number: ${{ github.event.number }}
