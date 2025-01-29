@@ -43,7 +43,16 @@ runs:
       id: cc
       with:
         issue-number: ${{ github.event.number }}
-        body-path: comments/start.md
+        body: |
+          
+          ### :octocat: Preview is deploying...
+
+          Please wait while the preview is deploying on Clever Cloud...
+
+          | ℹ️ Name              | 🔗 Infos & links                           |
+          | --------------------| ------------------------------------------|
+          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }} |
+          | 👁️ Preview           |  **Generating preview app...**            |
 
     # Install CLI 
     - name: Install clever-tools
@@ -84,7 +93,17 @@ runs:
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.cc.outputs.comment-id }}
-        body-path: comments/deploy.md
+        body: |
+          
+          ### :octocat: Preview is deploying...
+
+          Please wait while the preview is deploying on Clever Cloud...
+
+          | ℹ️ Name              | 🔗 Infos & links                           |
+          | --------------------| ------------------------------------------|
+          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }} |
+          | 👁️ Preview           |  **Generating preview app...**            |
+
         reactions: rocket
         edit-mode: replace
 
@@ -112,7 +131,17 @@ runs:
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
-        body-path: comments/deploy.md
+        body: |
+          
+          ### :octocat: Preview is deploying...
+
+          Please wait while the preview is deploying on Clever Cloud...
+
+          | ℹ️ Name              | 🔗 Infos & links                          |
+          | -------------------- | ------------------------------------------|
+          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }} |
+          | 👁️ Preview           |  **Generating preview app...**            |
+
         reactions: rocket
         edit-mode: replace
     
