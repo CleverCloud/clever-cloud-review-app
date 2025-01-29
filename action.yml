@@ -99,7 +99,7 @@ runs:
     - name: Install dependencies
       if: ${{ steps.deploy.outcome == 'success' }}
       shell: bash
-      run: pnpm install && pnpm run build
+      run: npm install pnpm && pnpm install && pnpm run build
         
 #- name: Get modified content files
 #  if: ${{ steps.deploy.outcome == 'success' || steps.update.outcome == 'success' }}
