@@ -33,10 +33,22 @@ inputs:
     description: 'Environment to run tests against'
     required: true
     default: ''
-  watch-path:
-    description: 'Path to monitor for changes (e.g., "content/")'
-    required: false
-    default: 'content/'
+  token:
+    description: 'GITHUB_TOKEN or a repo scoped PAT.'
+    default: ${{ github.token }}
+  repository:
+    description: 'The full name of the repository in which to create or update a comment.'
+    default: ${{ github.event.pull_request.base.repo.name }}
+  pr-number:
+    description: 'The number of the pull request in which to create a comment.'
+    required: true
+    default: ${{ github.event.number }}
+  comment-id:
+    description: Comment ID on the PR to update
+    default: ${{ github.event.comment.id }}
+  body:
+    description: The body of the comment
+    default: "This is a comment!"
 
 runs:
   using: "composite"
@@ -83,102 +95,107 @@ runs:
       run: |
         clever link -o "$ORGA_ID" ${{ inputs.name }}
         clever delete --alias ${{ inputs.alias }} --yes
-        
-- name: Get modified content files
-  if: ${{ steps.deploy.outcome == 'success' || steps.update.outcome == 'success' }}
-  shell: bash
-  id: get-modified-files
-  run: |
-    BASE_SHA="${{ github.event.pull_request.base.sha }}"
-    HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-
-    MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
-
-    MODIFIED_FILES_JSON=$(printf "%s" "$MODIFIED_FILES" | jq -R . | jq -s . | xargs || echo '[]')
     
-    echo "Modified files JSON: $MODIFIED_FILES_JSON"
-
-    modified_files="${MODIFIED_FILES_JSON}"
-    echo "Modified files: $modified_files"
-    echo "modified_files=$modified_files" >> "$GITHUB_OUTPUT"
-
-- name: Comment PR on app creation
-  if: ${{ steps.deploy.outcome == 'success' }}
-  uses: actions/github-script@v7
-  with:
-    script: |
-      try {
-        const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+    - name: Install dependencies
+      if: ${{ steps.deploy.outcome == 'success' }}
+      shell: bash
+      run: pnpm install
         
-        let message = `## 🚀 Review App Deployed\n\n`;
-        message += `### 🔗 App URL\n`;
-        message += `Your app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
-        
-        if (modifiedFiles && modifiedFiles.length > 0) {
-          message += `### 📄 Modified Pages\n`;
-          message += `The following pages were modified in this PR:\n\n`;
-          
-          for (const file of modifiedFiles) {
-            const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
-            
+#- name: Get modified content files
+#  if: ${{ steps.deploy.outcome == 'success' || steps.update.outcome == 'success' }}
+#  shell: bash
+#  id: get-modified-files
+#  run: |
+#    BASE_SHA="${{ github.event.pull_request.base.sha }}"
+#    HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+#
+#    MODIFIED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^${{ inputs.watch-path }}" || true)
 
-            const staticUrl = pageUrl.replace(new RegExp(`/${{ inputs['watch-path'] }}`, 'g'), "");
+#    MODIFIED_FILES_JSON=$(printf "%s" "$MODIFIED_FILES" | jq -R . | jq -s . | xargs || echo '[]')
+    
+#    echo "Modified files JSON: $MODIFIED_FILES_JSON"
+#
+#    modified_files="${MODIFIED_FILES_JSON}"
+#    echo "Modified files: $modified_files"
+#    echo "modified_files=$modified_files" >> "$GITHUB_OUTPUT"
 
-            message += `- [${file}](${staticUrl})\n`;
-          }
-        }
-
-        await github.rest.issues.createComment({
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          issue_number: context.payload.pull_request.number,
-          body: message
-        });
-
-      } catch (error) {
-        console.error('Error processing modified files or posting comment:', error);
-        throw error;
-      }
-
-
-    - name: Comment PR on app update
-      if: ${{ steps.update.outcome == 'success' }}
+    - name: Comment PR on app creation
+      if: ${{ steps.deploy.outcome == 'success' }}
       uses: actions/github-script@v7
       with:
-        script: |
-          const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
-          
-          let message = `## 🔄 Review App Updated\n\n`;
-          message += `### 🔗 App URL\n`;
-          message += `Your updated app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
-          
-          if (modifiedFiles && modifiedFiles.length > 0) {
-            message += `### 📄 Modified Pages\n`;
-            message += `The following pages were modified in this update:\n\n`;
-            
-            for (const file of modifiedFiles) {
-              const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
-              message += `- [${file}](${pageUrl})\n`;
-            }
-          }
-          
-          github.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.payload.pull_request.number,
-            body: message
-          });
-    
-    - name: Comment PR on deletion
-      if: ${{ steps.delete.outcome == 'success' }}
-      uses: actions/github-script@v7  
-      with:
-        script: |
-          const message = `## 👋 Review App Deleted\n\nThis PR has been closed and the review app has been deleted.`;
-          
-          github.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.payload.pull_request.number,
-            body: message
-          });
+        script: dist/main.js
+#          try {
+#            const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+#        
+#            let message = `## 🚀 Review App Deployed\n\n`;
+#            message += `### 🔗 App URL\n`;
+#            message += `Your app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
+#        
+#          if (modifiedFiles && modifiedFiles.length > 0) {
+#            message += `### 📄 Modified Pages\n`;
+#            message += `The following pages were modified in this PR:\n\n`;
+#          
+#            for (const file of modifiedFiles) {
+#              const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
+#            
+#
+#              const staticUrl = pageUrl.replace(new RegExp(`/${{ inputs#['watch-path'] }}`, 'g'), "");
+#
+#              message += `- [${file}](${staticUrl})\n`;
+#          }
+
+
+#        await github.rest.issues.createComment({
+#          owner: context.repo.owner,
+#          repo: context.repo.repo,
+#          issue_number: context.payload.pull_request.number,
+#          body: message
+#        });
+#
+#      } catch (error) {
+#        console.error('Error processing modified files or posting comment:', error);
+#        throw error;
+#      }
+
+
+#    - name: Comment PR on app update
+#      if: ${{ steps.update.outcome == 'success' }}
+#      uses: actions/github-script@v7
+#      with:
+#        script: |
+#          const modifiedFiles = JSON.parse('${{ steps.get-modified-files.outputs.modified_files }}');
+#          
+#          let message = `## 🔄 Review App Updated\n\n`;
+#          message += `### 🔗 App URL\n`;
+#          message += `Your updated app is available at [https://${{ inputs.domain }}](https://${{ inputs.domain }})\n\n`;
+#          
+#          if (modifiedFiles && modifiedFiles.length > 0) {
+#            message += `### 📄 Modified Pages\n`;
+#            message += `The following pages were modified in this update:\n\n`;
+#            
+#            for (const file of modifiedFiles) {
+#              const pageUrl = `https://${{ inputs.domain }}/${file.replace(/\.[^/.]+$/, '')}`;
+#              message += `- [${file}](${pageUrl})\n`;
+#            }
+#          }
+#          
+#          github.rest.issues.createComment({
+#            owner: context.repo.owner,
+#            repo: context.repo.repo,
+#            issue_number: context.payload.pull_request.number,
+#            body: message
+#          });
+#    
+#    - name: Comment PR on deletion
+#      if: ${{ steps.delete.outcome == 'success' }}
+#      uses: actions/github-script@v7  
+#      with:
+#        script: dist/comment.js
+#          const message = `## 👋 Review App Deleted\n\nThis PR has been closed and the review app has been deleted.`;
+#          
+#          github.rest.issues.createComment({
+#            owner: context.repo.owner,
+#            repo: context.repo.repo,
+#            issue_number: context.payload.pull_request.number,
+#            body: message
+#          });

@@ -1,0 +1,21 @@
+{
+  "name": "clever-cloud-review-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "utils": "^0.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
