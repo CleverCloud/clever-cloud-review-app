@@ -118,8 +118,6 @@ You can override default options by defining `region`, `domain`, `name`, and `al
 
 - `region`=`par` (Paris)
 - `domain`=`<repo-name>-PR-#.cleverapps.io`
-- `name`=`<repo-name>-PR-#>`
-- `alias`=`<repo-name>-PR-#>`
 
 ### Values for `--region`
 
