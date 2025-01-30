@@ -1,0 +1,57 @@
+{
+  "apps": [
+    {
+      "app_id": "app_0f7a73e7-2c2c-41b4-b70a-0659d9be274b",
+      "org_id": "orga_6da271bb-0caf-42de-b85b-7b92db11c150",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_0f7a73e7-2c2c-41b4-b70a-0659d9be274b.git",
+      "name": "express-demo",
+      "alias": "express-demo"
+    },
+    {
+      "app_id": "app_25fc8718-573b-458c-a9fd-3567e54aca04",
+      "org_id": "user_bd316ba2-4e6a-4a87-967e-1f7ef4efb510",
+      "deploy_url": "https://github.com/juliamrch/ci-cd-chaos.git",
+      "name": "myApp",
+      "alias": "myApp"
+    },
+    {
+      "app_id": "app_fe8791c6-eec5-4360-8900-c9c6c43759a1",
+      "org_id": "orga_6da271bb-0caf-42de-b85b-7b92db11c150",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_fe8791c6-eec5-4360-8900-c9c6c43759a1.git",
+      "name": "laravel",
+      "alias": "laravel"
+    },
+    {
+      "app_id": "app_a0b58e53-713b-4add-b621-9e3f86f48d9e",
+      "org_id": "orga_6da271bb-0caf-42de-b85b-7b92db11c150",
+      "deploy_url": "https://github.com/juliamrch/django-example.git",
+      "git_ssh_url": "https://github.com/juliamrch/django-example.git",
+      "name": "django-example",
+      "alias": "django-example"
+    },
+    {
+      "app_id": "app_b27fbaab-4f89-4e51-ae16-5d1555cfcbba",
+      "org_id": "orga_5c345d4b-8570-41b6-bacc-f9ab2de8ace3",
+      "deploy_url": "https://github.com/Studapart/acme.git",
+      "git_ssh_url": "https://github.com/Studapart/acme.git",
+      "name": "acme-school-PROD",
+      "alias": "acme-school-PROD"
+    },
+    {
+      "app_id": "app_84be0a6a-997f-4032-a48b-190cdca6c7b4",
+      "org_id": "orga_20a77f6b-5ad2-480e-8a6b-c6068c98e1dd",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_84be0a6a-997f-4032-a48b-190cdca6c7b4.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_84be0a6a-997f-4032-a48b-190cdca6c7b4.git",
+      "name": "UnzipServiceToMongoDB",
+      "alias": "UnzipServiceToMongoDB"
+    },
+    {
+      "app_id": "app_9ecf5530-83d2-49e3-8525-f0199e29e157",
+      "org_id": "orga_1dd2711f-3b56-4c26-b971-4e05c92b22ca",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_9ecf5530-83d2-49e3-8525-f0199e29e157.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_9ecf5530-83d2-49e3-8525-f0199e29e157.git",
+      "name": "clever-cloud-pipeline-MR-14",
+      "alias": "clever-cloud-pipeline-MR-14"
+    }
+  ]
+}
