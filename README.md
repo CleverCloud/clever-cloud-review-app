@@ -54,7 +54,7 @@ jobs:
 
 ```yaml
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, closed, synchronize, reopened]
     branches: [ main ]
 ```
