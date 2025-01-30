@@ -5,14 +5,14 @@ inputs:
   type:  
     description: 'Which type of app to create'
     required: true
-  name:
-    description: 'The name of your app'
-    required: true
-    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
-  alias:
-    description: 'The alias of your app'
-    required: true
-    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+#  name:
+#    description: 'The name of your app'
+#    required: true
+#    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+#  alias:
+#    description: 'The alias of your app'
+#    required: true
+#    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
   region:
     description: 'The region to deploy on'
     required: true
@@ -30,9 +30,9 @@ inputs:
     required: false
     default: 'false'
   environment:
-        description: 'Environment to run tests against'
-        required: true
-        default: ''
+      description: 'Environment to run tests against'
+      required: true
+      default: ''
 runs:
   using: "composite"
   steps:
@@ -59,12 +59,12 @@ runs:
       shell: bash
       run: npm install -g clever-tools
     
-    # On PR opening, create app
+    # On PR opening, create & configure app
     - name: Create app
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
       run: |
-        clever create --type ${{ inputs.type }} ${{ inputs.name }} --alias ${{ inputs.alias }} --region ${{ inputs.region }} --org ${{ inputs.organization }}
+        clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region ${{ inputs.region }} --org ${{ inputs.organization }}
         clever domain add ${{ inputs.domain }}
       
     - name: Set environment variables
@@ -78,7 +78,7 @@ runs:
         # Inject variable in the app on Clever Cloud
           clever env set $real_var "${!var}"
        done
-    
+
     - name: Deploy app
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
@@ -99,10 +99,10 @@ runs:
 
           Check how your changes look like!
 
-          | ℹ️ Name              | 🔗 Infos & links                             |
-          | -------------------- | ---------------------------------------------|
-          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }}    |
-          | 👁️ Preview           | https://${{ inputs.domain }}                |
+          | ℹ️ Name                    | 🔗 Infos & links                             |
+          | ------------------------- | ---------------------------------------------|
+          | 🌱 Latest deployed commit  | ${{ github.event.pull_request.head.sha }} |
+          | 👁️ Preview                 | https://${{ inputs.domain }} |
 
         reactions: rocket
         edit-mode: replace
@@ -113,7 +113,7 @@ runs:
       shell: bash
       id: update
       run: |
-        clever link -o "$ORGA_ID" ${{ inputs.name }}
+        clever link -o "$ORGA_ID" ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
         clever deploy --force
     # Update comment    
     - name: Find Comment
@@ -137,10 +137,10 @@ runs:
 
           Check how your changes look like!
 
-          | ℹ️ Name              | 🔗 Infos & links                             |
-          | -------------------- | ---------------------------------------------|
-          | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }}    |
-          | 👁️ Preview           | https://${{ inputs.domain }}                 |
+          | ℹ️ Name                    | 🔗 Infos & links                             |
+          | ------------------------- | ---------------------------------------------|
+          | 🌱 Latest deployed commit  | ${{ github.event.pull_request.head.sha }} |
+          | 👁️ Preview                 | https://${{ inputs.domain }} |
 
         reactions: rocket
         edit-mode: replace
@@ -150,37 +150,9 @@ runs:
       shell: bash
       id: delete
       run: |
-        clever link -o "$ORGA_ID" ${{ inputs.name }}
-        clever delete --alias ${{ inputs.alias }} --yes
-    
-#    - name: Comment PR on app creation
-#      if: ${{ steps.deploy.outcome == 'success' }}
-#      uses: actions/github-script@v7
-#      with:
-#        script: |
-#          const issue_number = context.payload.pull_request.number;
-#          const message = `Deployment has finished 👁️👄👁️ Your app is available [here](https://${{ inputs.domain }})`;
-#            github.rest.issues.createComment({
-#            owner: context.repo.owner,
-#            repo: context.repo.repo,
-#              issue_number: issue_number,
-#              body: message
-#              });
+        clever link -o "$ORGA_ID" ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+        clever delete --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --yes
 
-#    - name: Comment PR on app update
-#      if: ${{ steps.update.outcome == 'success' }}
-#      uses: actions/github-script@v7
-#      with:
-#        script: |
-#          const issue_number = context.payload.pull_request.number;
-#          const message = `🚀 You updated your review app. Check it [here](https://${{ inputs.domain }})`;
-#            github.rest.issues.createComment({
-#            owner: context.repo.owner,
-#            repo: context.repo.repo,
-#              issue_number: issue_number,
-#              body: message
-#              });
-    
     - name: Comment PR on deletion
       if: ${{ steps.delete.outcome == 'success' }}
       uses: peter-evans/create-or-update-comment@v4
