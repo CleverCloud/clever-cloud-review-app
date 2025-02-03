@@ -68,8 +68,8 @@ runs:
         ORGA_ID: ${{ inputs.organization }}
         REGION: ${{ inputs.region }}
       run: |
-        clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region "$REGION" --org "$ORGA_ID"
-        clever domain add "$DOMAIN"
+        clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region $REGION --org $ORGA_ID
+        clever domain add $DOMAIN
       
     - name: Set environment variables
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' && inputs.set-env }}
@@ -119,7 +119,7 @@ runs:
       shell: bash
       id: update
       run: |
-        clever link -o "$ORGA_ID" ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+        clever link -o $ORGA_ID ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
         clever deploy --force
     # Update comment    
     - name: Find Comment
@@ -158,7 +158,7 @@ runs:
       shell: bash
       id: delete
       run: |
-        clever link -o "$ORGA_ID" ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+        clever link -o $ORGA_ID ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
         clever delete --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --yes
 
     - name: Comment PR on deletion
