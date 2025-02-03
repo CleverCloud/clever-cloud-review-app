@@ -68,7 +68,7 @@ runs:
         ORGA_ID: ${{ inputs.organization }}
         REGION: ${{ inputs.region }}
       run: |
-        clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region ${{ env.REGION }} --org ${{ env.ORGA_ID}
+        clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region ${{ env.REGION }} --org ${{ env.ORGA_ID }}
         clever domain add ${{ env.DOMAIN}}
       
     - name: Set environment variables
