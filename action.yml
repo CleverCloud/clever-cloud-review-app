@@ -1,5 +1,8 @@
 name: 'Clever Cloud review app on PRs'
 description: 'Deploy a review app on Clever Cloud when a PR is opened'
+branding:
+  icon: 'upload-cloud'
+  color: 'red'
 
 inputs:
   type:  
