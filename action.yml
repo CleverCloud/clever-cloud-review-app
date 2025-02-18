@@ -45,7 +45,7 @@ runs:
   steps:
     # Create comment on PR
     - name: Create comment
-      if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.comment }}
+      if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.comment == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       id: cc
       with:
@@ -97,7 +97,7 @@ runs:
       run: clever deploy
     # Update comment
     - name: Comment PR
-      if: ${{ steps.deploy.outcome == 'success' && inputs.comment }}
+      if: ${{ steps.deploy.outcome == 'success' && inputs.comment == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       id: deploy-c
       continue-on-error: true
@@ -130,7 +130,7 @@ runs:
         clever deploy --force
     # Update comment    
     - name: Find Comment
-      if: ${{ inputs.comment }}
+      if: ${{ inputs.comment == 'true' }}
       uses: peter-evans/find-comment@v3
       id: fc
       continue-on-error: true
@@ -138,7 +138,7 @@ runs:
         issue-number: ${{ github.event.number }}
         comment-author: github-actions[bot]
     - name: Update comment
-      if: ${{ steps.update.outcome == 'success' && inputs.comment }}
+      if: ${{ steps.update.outcome == 'success' && inputs.comment == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       id: update-c
       continue-on-error: true
@@ -170,7 +170,7 @@ runs:
         clever delete --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --yes
 
     - name: Comment PR on deletion
-      if: ${{ steps.delete.outcome == 'success' && inputs.comment }}
+      if: ${{ steps.delete.outcome == 'success' && inputs.comment == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       id: delete-c
       continue-on-error: true
