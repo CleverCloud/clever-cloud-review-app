@@ -45,7 +45,7 @@ runs:
   steps:
     # Create comment on PR
     - name: Create comment
-      if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' && inputs.comment }}
+      if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.comment }}
       uses: peter-evans/create-or-update-comment@v4
       id: cc
       with:
