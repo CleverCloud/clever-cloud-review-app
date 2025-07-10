@@ -1,4 +1,3 @@
-
 # Review Apps on Clever Cloud
 
 This GitHub Action does the following
@@ -11,27 +10,28 @@ The action will consider both branches on the same repository, and pull requests
 
 ## Requirements for this Action
 
-- A [Clever Cloud](https://www.clever-cloud.com) account
-- An [organisation](https://developers.clever-cloud.com/doc/account/administrate-organization/) in Clever Cloud
-- [Clever Cloud CLI](https://developers.clever-cloud.com/doc/cli/getting_started/) installed in your machine to inject your tokens
+- [A Clever Cloud account](https://www.clever-cloud.com)
+- [Clever Tools](https://developers.clever-cloud.com/doc/cli) installed in your machine to get your tokens
 
 ### Mandatory configuration
 
-Add the following secrets to your repository, in **Settings > Secrets and variables**:
+You need to add tokens as secrets in your GitHub repository settings (**Secrets and variables > Actions**):
 
-- `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `clever-tools.json` after installing the CLI (example path on Mac: `~/.config/clever-cloud/clever-tools.json`)
-- `ORGA_ID`: the organisation in which your app is create
+- `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `~/.config/clever-cloud/clever-tools.json` if you're logged in
+- `ORGA_ID`: the organisation in which the review apps should be created
 - `GITHUB_TOKEN`: implicit, to enable comments on the PR
 
-For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions. Follow these steps to do so:
+For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions, following these steps:
 
-1. Create a new user with a new email adress on Clever Cloud
-2. Create a specific organization for deploying review apps
+1. Create a new user with a new e-mail address on Clever Cloud
+2. Create a specific organisation for deploying review apps
 3. From your terminal, run `clever logout` and `clever login` right after
-4. Log into the Console with your new user credetials
-5. Get the generated  `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
+4. Log into the Console with your new user credentials
+5. Get the generated `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
 
-Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Acction user's tokens won't be revoked and will be used only from GitHub.
+Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Action user's tokens won't be revoked and will be used only from GitHub.
+
+- View and revoke OAuth tokens [from the Clever Cloud Console](https://console.clever-cloud.com/users/me/oauth-tokens)
 
 ### Permissions
 
@@ -73,30 +73,36 @@ on:
           type: '<type-of-app>'
 ```
 
-### Values for `--type`
+### Values for `type`
 
-- `docker`: for Docker-based applications
-- `elixir`: for Elixir-based applications
-- `go`: for Go applications
-- `gradle`: for applications launched with Gradle
-- `haskell`: for Haskell applications
-- `jar`: for applications deployed as standalone JAR files
-- `maven`: for applications launched with Maven
-- `meteor`: for Meteor applications launched with Node.js
-- `node`: for Node.js applications
-- `php`: for PHP applications
-- `play1`: for Play1 applications
-- `play2`: for Play2 applications
-- `python`: for Python applications
-- `ruby`: for Ruby applications
-- `rust`: for Rust applications
-- `sbt`: for applications launched with SBT
-- `static-apache`: for static (HTML only) websites
-- `war`: for applications deployed as WAR files
+Choose one [of the runtimes that Clever Cloud support](https://www.clever-cloud.com/developers/doc/applications/) to deploy your review app:
+
+- `docker`
+- `elixir`
+- `frankenphp`
+- `go`
+- `gradle`
+- `haskell`
+- `jar`
+- `linux`
+- `maven`
+- `meteor`
+- `node`
+- `php`
+- `play1`
+- `play2`
+- `python`
+- `ruby`
+- `rust`
+- `sbt`
+- `static`
+- `static-apache`
+- `v`
+- `war`
 
 ### Inject secrets and variables
 
-To inject your app secrets and environment variables on Clever Cloud, add them to your GitHub repository in **Settings > Secrets and variables**, then add them with an `GH_` prefix in your workflow file. Finally, enable the injection with `set-env: true`:
+To inject your app secrets and environment variables on Clever Cloud, add them to your GitHub repository settings in **Secrets and variables > Actions**, then add them with a `GH_` prefix in your workflow file. Finally, enable the injection with `set-env: true`:
 
 ```yaml
 name: Create review app
@@ -122,11 +128,13 @@ You can override default options by defining `region`, `domain`, `name`, and `al
 ### Values for `--region`
 
 - `par` (Paris, [Clever Cloud](https://www.clever-cloud.com/infrastructure/))
-- `grahds` (Gravelines, HDS servers, OVHcloud)
-- `rbx` (Roubaix, OVHcloud)
-- `rbxhds` (Roubaix, HDS servers, OVHcloud)
+- `parhds` (Paris, HDS infrastructure, [Clever Cloud](https://www.clever-cloud.com/infrastructure/))
 - `scw` (Paris, [Scaleway DC5](https://www.clever-cloud.com/blog/press/2023/01/17/clever-cloud-and-scaleway-join-forces-to-unveil-a-sovereign-european-paas-offering/))
+- `grahds` (Gravelines, HDS infrastructure, OVHcloud)
+- `ldn` (London, Ionos)
 - `mtl` (Montreal, OVHcloud)
+- `rbx` (Roubaix, OVHcloud)
+- `rbxhds` (Roubaix, HDS infrastructure, OVHcloud)
 - `sgp` (Singapore, OVHcloud)
 - `syd` (Sydney, OVHcloud)
 - `wsw` (Warsaw, OVHcloud)
