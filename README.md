@@ -1,4 +1,3 @@
-
 # Review Apps on Clever Cloud
 
 This GitHub Action does the following
@@ -23,15 +22,16 @@ Add the following secrets to your repository, in **Settings > Secrets and variab
 - `ORGA_ID`: the organisation in which your app is create
 - `GITHUB_TOKEN`: implicit, to enable comments on the PR
 
-For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions. Follow these steps to do so:
+For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions, following these steps:
 
-1. Create a new user with a new email adress on Clever Cloud
+1. Create a new user with a new e-mail address on Clever Cloud
 2. Create a specific organization for deploying review apps
 3. From your terminal, run `clever logout` and `clever login` right after
-4. Log into the Console with your new user credetials
-5. Get the generated  `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
+4. Log into the Console with your new user credentials
+5. Get the generated `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
 
-Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Acction user's tokens won't be revoked and will be used only from GitHub.
+Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Action user's tokens won't be revoked and will be used only from GitHub.
+
 
 ### Permissions
 
