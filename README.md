@@ -10,28 +10,28 @@ The action will consider both branches on the same repository, and pull requests
 
 ## Requirements for this Action
 
-- A [Clever Cloud](https://www.clever-cloud.com) account
-- An [organisation](https://developers.clever-cloud.com/doc/account/administrate-organization/) in Clever Cloud
-- [Clever Cloud CLI](https://developers.clever-cloud.com/doc/cli/getting_started/) installed in your machine to inject your tokens
+- [A Clever Cloud account](https://www.clever-cloud.com)
+- [Clever Tools](https://developers.clever-cloud.com/doc/cli) installed in your machine to get your tokens
 
 ### Mandatory configuration
 
-Add the following secrets to your repository, in **Settings > Secrets and variables**:
+You need to add tokens as secrets in your GitHub repository settings (**Secrets and variables > Actions**):
 
-- `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `clever-tools.json` after installing the CLI (example path on Mac: `~/.config/clever-cloud/clever-tools.json`)
-- `ORGA_ID`: the organisation in which your app is create
+- `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `~/.config/clever-cloud/clever-tools.json` if you're logged in
+- `ORGA_ID`: the organisation in which the review apps should be created
 - `GITHUB_TOKEN`: implicit, to enable comments on the PR
 
 For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions, following these steps:
 
 1. Create a new user with a new e-mail address on Clever Cloud
-2. Create a specific organization for deploying review apps
+2. Create a specific organisation for deploying review apps
 3. From your terminal, run `clever logout` and `clever login` right after
 4. Log into the Console with your new user credentials
 5. Get the generated `CLEVER_SECRET` and `CLEVER_TOKEN` and inject it into your repository secrets
 
 Run `clever login` again and connect from your main account to set your personal tokens. Your GitHub Action user's tokens won't be revoked and will be used only from GitHub.
 
+- View and revoke OAuth tokens [from the Clever Cloud Console](https://console.clever-cloud.com/users/me/oauth-tokens)
 
 ### Permissions
 
@@ -102,7 +102,7 @@ Choose one [of the runtimes that Clever Cloud support](https://www.clever-cloud.
 
 ### Inject secrets and variables
 
-To inject your app secrets and environment variables on Clever Cloud, add them to your GitHub repository in **Settings > Secrets and variables**, then add them with an `GH_` prefix in your workflow file. Finally, enable the injection with `set-env: true`:
+To inject your app secrets and environment variables on Clever Cloud, add them to your GitHub repository settings in **Secrets and variables > Actions**, then add them with a `GH_` prefix in your workflow file. Finally, enable the injection with `set-env: true`:
 
 ```yaml
 name: Create review app
