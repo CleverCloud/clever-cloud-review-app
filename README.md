@@ -73,26 +73,32 @@ on:
           type: '<type-of-app>'
 ```
 
-### Values for `--type`
+### Values for `type`
 
-- `docker`: for Docker-based applications
-- `elixir`: for Elixir-based applications
-- `go`: for Go applications
-- `gradle`: for applications launched with Gradle
-- `haskell`: for Haskell applications
-- `jar`: for applications deployed as standalone JAR files
-- `maven`: for applications launched with Maven
-- `meteor`: for Meteor applications launched with Node.js
-- `node`: for Node.js applications
-- `php`: for PHP applications
-- `play1`: for Play1 applications
-- `play2`: for Play2 applications
-- `python`: for Python applications
-- `ruby`: for Ruby applications
-- `rust`: for Rust applications
-- `sbt`: for applications launched with SBT
-- `static-apache`: for static (HTML only) websites
-- `war`: for applications deployed as WAR files
+Choose one [of the runtimes that Clever Cloud support](https://www.clever-cloud.com/developers/doc/applications/) to deploy your review app:
+
+- `docker`
+- `elixir`
+- `frankenphp`
+- `go`
+- `gradle`
+- `haskell`
+- `jar`
+- `linux`
+- `maven`
+- `meteor`
+- `node`
+- `php`
+- `play1`
+- `play2`
+- `python`
+- `ruby`
+- `rust`
+- `sbt`
+- `static`
+- `static-apache`
+- `v`
+- `war`
 
 ### Inject secrets and variables
 
