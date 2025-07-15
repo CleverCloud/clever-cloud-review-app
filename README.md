@@ -63,7 +63,7 @@ on:
 
 ```yaml
 - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@latest
+        uses: CleverCloud/clever-cloud-review-app@v2.0.1
         env:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -106,7 +106,7 @@ To inject your app secrets and environment variables on Clever Cloud, add them t
 
 ```yaml
 name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@latest
+        uses: CleverCloud/clever-cloud-review-app@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # To enable comments on the PR
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
