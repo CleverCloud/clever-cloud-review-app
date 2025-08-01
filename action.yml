@@ -140,9 +140,27 @@ runs:
           | 👁️ Preview           |  **Generating preview app...**            |
 
     # Install the Clever Cloud CLI tools to interact with the Clever Cloud platform.
+    # Validate inputs
+    - name: Validate inputs
+      shell: bash
+      run: |
+        echo "::add-mask::$CLEVER_SECRET"
+        echo "::add-mask::$CLEVER_TOKEN"
+        if [[ -z "$CLEVER_SECRET" ]] || [[ -z "$CLEVER_TOKEN" ]] || [[ -z "${{ inputs.orga-id }}" ]]; then
+          echo "❌ Missing required environment variables: CLEVER_SECRET, CLEVER_TOKEN, or orga-id"
+          exit 1
+        fi
+        echo "✅ All required inputs validated"
+
     - name: Install clever-tools
       shell: bash
-      run: npm install -g clever-tools || { echo "Failed to install clever-tools"; exit 1; }
+      run: |
+        echo "📦 Installing clever-tools..."
+        npm install -g clever-tools || { 
+          echo "❌ Failed to install clever-tools"; 
+          exit 1;
+        }
+        echo "✅ clever-tools installed successfully"
 
     # Create and configure the application on Clever Cloud when a PR is opened or reopened.
     - name: Create app
