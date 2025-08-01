@@ -149,8 +149,7 @@ runs:
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
       env:
-        DOMAIN: ${{ inputs.domain }}
-        ORGA_ID: ${{ inputs.organization }}
+        ORGA_ID: ${{ inputs.orga-id }}
         REGION: ${{ inputs.region }}
       run: |
         clever create --type ${{ inputs.type }} ${{ env.APP_NAME }} --alias ${{ env.APP_ALIAS }} --region ${{ inputs.region }} --org ${{ inputs.orga-id }}
@@ -194,7 +193,7 @@ runs:
       id: deploy-c
       continue-on-error: true
       env:
-        DOMAIN: ${{ inputs.domain }}
+        DOMAIN: ${{ env.APP_DOMAIN }}
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.cc.outputs.comment-id }}
@@ -235,7 +234,7 @@ runs:
       id: update-c
       continue-on-error: true
       env:
-        DOMAIN: ${{ inputs.domain }}
+        DOMAIN: ${{ env.APP_DOMAIN }}
       with:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
@@ -252,6 +251,20 @@ runs:
 
         reactions: rocket
         edit-mode: replace
+
+    # Set outputs for the action
+    - name: Set outputs
+      if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize' }}
+      shell: bash
+      id: set-outputs
+      run: |
+        echo "app-url=https://${{ env.APP_DOMAIN }}" >> $GITHUB_OUTPUT
+        echo "app-name=${{ env.APP_NAME }}" >> $GITHUB_OUTPUT
+        if [[ "${{ steps.deploy.outcome }}" == "success" ]] || [[ "${{ steps.update.outcome }}" == "success" ]]; then
+          echo "deployment-status=success" >> $GITHUB_OUTPUT
+        else
+          echo "deployment-status=failed" >> $GITHUB_OUTPUT
+        fi
 
     - name: Delete app
       if: ${{ github.event.action == 'closed' }}
