@@ -6,52 +6,107 @@ branding:
 
 inputs:
   type:
-    description: 'Which type of app to create'
+    description: 'Specify the type of application to create'
     required: true
+    type: choice
+    options:
+      - docker
+      - elixir
+      - frankenphp
+      - go
+      - gradle
+      - haskell
+      - jar
+      - linux
+      - maven
+      - meteor
+      - node
+      - php
+      - play1
+      - play2
+      - python
+      - ruby
+      - rust
+      - sbt
+      - static
+      - static-apache
+      - v
+      - war
   flavor:
-    description: 'Application flavor'
+    description: 'Optional: Specify the application flavor'
     required: false
-    type: string
+    type: choice
+    options:
+      - pico
+      - nano
+      - XS
+      - S
+      - M
+      - L
+      - XL
+      - 2XL
+      - 3XL
   build-flavor:
-    description: 'Application build flavor'
+    description: 'Optional: Specify the build flavor for the application'
+    required: false
+    type: choice
+    options:
+      - pico
+      - nano
+      - XS
+      - S
+      - M
+      - L
+      - XL
+      - 2XL
+      - 3XL
+  name:
+    description: 'Optional: The name of your app. Defaults to repo-name-PR-number'
     required: false
     type: string
-#  name:
-#    description: 'The name of your app'
-#    required: true
-#    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
-#  alias:
-#    description: 'The alias of your app'
-#    required: true
-#    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
+  alias:
+    description: 'Optional: The alias of your app. Defaults to repo-name-PR-number'
+    required: false
+    type: string
   region:
-    description: 'The region to deploy on'
+    description: 'Specify the region where the application will be deployed'
+    required: false
+    default: par
+    type: choice
+    options:
+      - par
+      - parhds
+      - scw
+      - grahds
+      - ldn
+      - mtl
+      - rbx
+      - rbxhds
+      - sgp
+      - syd
+      - wsw
+  orga-id:
+    description: 'Specify the organization ID where the application will be deployed'
     required: true
-    default: 'par'
-  organization:
-    description: 'The organization to deploy on'
-    required: true
-    default: $ORGA_ID
+    type: string
   domain:
-    description: 'The domain to use for the app'
+    description: 'Optional: Specify the domain to use for the application. Defaults to a generated domain based on the PR'
     required: false
-    default: ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io
+    type: string
   set-env:
-    description: 'Set environment variables'
+    description: 'Optional: Set environment variables for the application'
     required: false
-    default: 'false'
-  environment:
-      description: 'Environment to run tests against'
-      required: true
-      default: ''
+    default: false
+    type: boolean
   comment:
-    description: 'Comment PR with preview link?'
+    description: 'Optional: Comment on the PR with a link to the preview app'
     required: false
-    default: 'true'
+    default: true
+    type: boolean
 runs:
   using: "composite"
   steps:
-    # Create comment on PR
+    # Create a comment on the PR to notify that the preview app is being deployed.
     - name: Create comment
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.comment == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
@@ -69,31 +124,31 @@ runs:
           | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }} |
           | 👁️ Preview           |  **Generating preview app...**            |
 
-    # Install CLI
+    # Install the Clever Cloud CLI tools to interact with the Clever Cloud platform.
     - name: Install clever-tools
       shell: bash
-      run: npm install -g clever-tools
+      run: npm install -g clever-tools || { echo "Failed to install clever-tools"; exit 1; }
 
-    # On PR opening, create & configure app
+    # Create and configure the application on Clever Cloud when a PR is opened or reopened.
     - name: Create app
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
       env:
         DOMAIN: ${{ inputs.domain }}
-#        ORGA_ID: ${{ inputs.organization }}
+        ORGA_ID: ${{ inputs.organization }}
         REGION: ${{ inputs.region }}
       run: |
         clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region ${{ env.REGION }} --org ${{ inputs.organization }}
         clever domain add ${{ env.DOMAIN}}
 
-    # Configure flavor if provided
+    # Configure the application flavor if it is provided in the inputs.
     - name: Configure flavor
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.flavor != '' }}
       shell: bash
       run: |
         clever scale --flavor ${{ inputs.flavor }}
 
-    # Configure build-flavor if provided
+    # Configure the build flavor for the application if it is provided in the inputs.
     - name: Configure build-flavor
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.build-flavor != '' }}
       shell: bash
@@ -104,7 +159,7 @@ runs:
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' && inputs.set-env }}
       shell: bash
       run: |
-       # Remove prefix from print
+       # Remove prefix from environment variables and set them in the app on Clever Cloud
        for var in $(env | awk -F= '/^GH_/ { print $1 }')
        do
         real_var=${var#GH_}
@@ -116,8 +171,8 @@ runs:
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
       id: deploy
-      run: clever deploy
-    # Update comment
+      run: clever deploy || { echo "Deployment failed"; exit 1; }
+    # Update the PR comment with a link to the deployed review app once deployment is successful.
     - name: Comment PR
       if: ${{ steps.deploy.outcome == 'success' && inputs.comment == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
@@ -142,7 +197,7 @@ runs:
         reactions: rocket
         edit-mode: replace
 
-    # On new pushes on the PR
+    # Update the application on Clever Cloud when new commits are pushed to the PR.
     - name: Update app
       if: ${{ github.event.action == 'synchronize' }}
       shell: bash
@@ -150,7 +205,7 @@ runs:
       run: |
         clever link -o ${{ inputs.organization }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
         clever deploy --force
-    # Update comment
+    # Find and update the existing comment on the PR with the latest deployment information.
     - name: Find Comment
       if: ${{ inputs.comment == 'true' }}
       uses: peter-evans/find-comment@v3
