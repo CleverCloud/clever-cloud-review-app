@@ -100,6 +100,23 @@ Choose one [of the runtimes that Clever Cloud support](https://www.clever-cloud.
 - `v`
 - `war`
 
+### Application scaling
+
+Use a specific `flavor` to scale your review app, and `build-flavor` to use a dedicated build instance on a different flavor:
+
+```yaml
+- name: Create review app
+        uses: CleverCloud/clever-cloud-review-app@v2.0.1
+        with:
+          type: '<type-of-app>'
+          flavor: '<flavor>'
+          build-flavor: '<build-flavor>'
+```
+
+Available flavors: `pico`, `nano`, `XS`, `S`, `M`, `L`, `XL`, `2XL`, `3XL`
+
+Flavor pico is not available for the following instances: `docker`, `frankenphp`, `php`, `static-apache`
+
 ### Inject secrets and variables
 
 To inject your app secrets and environment variables on Clever Cloud, add them to your GitHub repository settings in **Secrets and variables > Actions**, then add them with a `GH_` prefix in your workflow file. Finally, enable the injection with `set-env: true`:
