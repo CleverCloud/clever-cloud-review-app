@@ -63,7 +63,7 @@ on:
 
 ```yaml
 - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v2.0.1
+        uses: CleverCloud/clever-cloud-review-app@v2.0.2
         env:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -106,7 +106,7 @@ Use a specific `flavor` to scale your review app, and `build-flavor` to use a de
 
 ```yaml
 - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v2.0.1
+        uses: CleverCloud/clever-cloud-review-app@v2.0.2
         with:
           type: '<type-of-app>'
           flavor: '<flavor>'
@@ -123,7 +123,7 @@ To inject your app secrets and environment variables on Clever Cloud, add them t
 
 ```yaml
 name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v2.0.1
+        uses: CleverCloud/clever-cloud-review-app@v2.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # To enable comments on the PR
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
