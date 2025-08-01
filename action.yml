@@ -5,9 +5,17 @@ branding:
   color: 'red'
 
 inputs:
-  type:  
+  type:
     description: 'Which type of app to create'
     required: true
+  flavor:
+    description: 'Application flavor'
+    required: false
+    type: string
+  build-flavor:
+    description: 'Application build flavor'
+    required: false
+    type: string
 #  name:
 #    description: 'The name of your app'
 #    required: true
@@ -51,7 +59,7 @@ runs:
       with:
         issue-number: ${{ github.event.number }}
         body: |
-          
+
           ### :octocat: Preview is deploying...
 
           Please wait while the preview is deploying on Clever Cloud...
@@ -61,11 +69,11 @@ runs:
           | 🌱 Deploying commit  | ${{ github.event.pull_request.head.sha }} |
           | 👁️ Preview           |  **Generating preview app...**            |
 
-    # Install CLI 
+    # Install CLI
     - name: Install clever-tools
       shell: bash
       run: npm install -g clever-tools
-    
+
     # On PR opening, create & configure app
     - name: Create app
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
@@ -77,7 +85,21 @@ runs:
       run: |
         clever create --type ${{ inputs.type }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --alias ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }} --region ${{ env.REGION }} --org ${{ inputs.organization }}
         clever domain add ${{ env.DOMAIN}}
-      
+
+    # Configure flavor if provided
+    - name: Configure flavor
+      if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.flavor != '' }}
+      shell: bash
+      run: |
+        clever scale --flavor ${{ inputs.flavor }}
+
+    # Configure build-flavor if provided
+    - name: Configure build-flavor
+      if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.build-flavor != '' }}
+      shell: bash
+      run: |
+        clever scale --build-flavor ${{ inputs.build-flavor }}
+
     - name: Set environment variables
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' && inputs.set-env }}
       shell: bash
@@ -107,7 +129,7 @@ runs:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.cc.outputs.comment-id }}
         body: |
-          
+
           ### ✅ Review app deployed
 
           Check how your changes look like!
@@ -128,7 +150,7 @@ runs:
       run: |
         clever link -o ${{ inputs.organization }} ${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}
         clever deploy --force
-    # Update comment    
+    # Update comment
     - name: Find Comment
       if: ${{ inputs.comment == 'true' }}
       uses: peter-evans/find-comment@v3
@@ -148,7 +170,7 @@ runs:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
         body: |
-          
+
           ### ✅ Review app deployed
 
           Check how your changes look like!
@@ -160,7 +182,7 @@ runs:
 
         reactions: rocket
         edit-mode: replace
-    
+
     - name: Delete app
       if: ${{ github.event.action == 'closed' }}
       shell: bash
@@ -178,9 +200,9 @@ runs:
         issue-number: ${{ github.event.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
         body: |
-          
+
           ###  👋` Review app deleted
-          
+
           You closed this PR and deleted the review app.
 
         edit-mode: replace
