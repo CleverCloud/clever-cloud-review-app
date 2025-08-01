@@ -18,7 +18,7 @@ The action will consider both branches on the same repository, and pull requests
 You need to add tokens as secrets in your GitHub repository settings (**Secrets and variables > Actions**):
 
 - `CLEVER_SECRET` and `CLEVER_TOKEN`: find them in your `~/.config/clever-cloud/clever-tools.json` if you're logged in
-- `ORGA_ID`: the organisation in which the review apps should be created
+- `ORGA_ID`: the organisation in which the review apps should be created (use as `orga-id` input)
 - `GITHUB_TOKEN`: implicit, to enable comments on the PR
 
 For better security, we advise generating a specific `CLEVER_SECRET` and `CLEVER_TOKEN` for GitHub Actions, following these steps:
@@ -63,14 +63,14 @@ on:
 
 ```yaml
 - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v2.0.2
+        uses: CleverCloud/clever-cloud-review-app@v3.0.0
         env:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
-          ORGA_ID: ${{ secrets.ORGA_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           type: '<type-of-app>'
+          orga-id: ${{ secrets.ORGA_ID }}
 ```
 
 ### Values for `type`
@@ -106,9 +106,14 @@ Use a specific `flavor` to scale your review app, and `build-flavor` to use a de
 
 ```yaml
 - name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v2.0.2
+        uses: CleverCloud/clever-cloud-review-app@v3.0.0
+        env:
+          CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+          CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           type: '<type-of-app>'
+          orga-id: ${{ secrets.ORGA_ID }}
           flavor: '<flavor>'
           build-flavor: '<build-flavor>'
 ```
@@ -123,16 +128,16 @@ To inject your app secrets and environment variables on Clever Cloud, add them t
 
 ```yaml
 name: Create review app
-        uses: CleverCloud/clever-cloud-review-app@v2.0.2
+        uses: CleverCloud/clever-cloud-review-app@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # To enable comments on the PR
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
-          ORGA_ID: ${{ secrets.ORGA_ID }}
-          GH_CC_RUN_SUCCEEDED_HOOK: ${{ secrets. CC_RUN_SUCCEEDED_HOOK }} # This environment variable will be set on Clever Cloud
+          GH_CC_RUN_SUCCEEDED_HOOK: ${{ secrets.CC_RUN_SUCCEEDED_HOOK }} # This environment variable will be set on Clever Cloud
         with:
           type: '<type-of-app>'
-          set-env: true # Enables the command to set en vars on Clever Cloud
+          orga-id: ${{ secrets.ORGA_ID }}
+          set-env: true # Enables the command to set environment vars on Clever Cloud
 ```
 
 ## Options
@@ -141,6 +146,29 @@ You can override default options by defining `region`, `domain`, `name`, and `al
 
 - `region`=`par` (Paris)
 - `domain`=`<repo-name>-PR-#.cleverapps.io`
+- `name`=`<repo-name>-PR-#`
+- `alias`=`<repo-name>-PR-#`
+
+## Outputs
+
+The action provides the following outputs that you can use in subsequent steps:
+
+- `app-url`: URL of the deployed review app
+- `app-name`: Name of the created app
+- `deployment-status`: Status of the deployment (success/failed)
+
+```yaml
+- name: Create review app
+  id: deploy-review
+  uses: CleverCloud/clever-cloud-review-app@v3.0.0
+  # ... inputs ...
+
+- name: Use outputs
+  run: |
+    echo "Review app URL: ${{ steps.deploy-review.outputs.app-url }}"
+    echo "App name: ${{ steps.deploy-review.outputs.app-name }}"
+    echo "Status: ${{ steps.deploy-review.outputs.deployment-status }}"
+```
 
 ### Values for `--region`
 
