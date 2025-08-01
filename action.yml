@@ -116,11 +116,36 @@ outputs:
 
 runs:
   using: "composite"
-  env:
-    APP_NAME: ${{ inputs.name || format('{0}-PR-{1}', github.event.pull_request.base.repo.name, github.event.number) }}
-    APP_ALIAS: ${{ inputs.alias || format('{0}-PR-{1}', github.event.pull_request.base.repo.name, github.event.number) }}
-    APP_DOMAIN: ${{ inputs.domain || format('{0}-PR-{1}.cleverapps.io', github.event.pull_request.base.repo.name, github.event.number) }}
   steps:
+    # Set environment variables for the action
+    - name: Set environment variables
+      shell: bash
+      run: |
+        APP_NAME="${{ inputs.name }}"
+        APP_ALIAS="${{ inputs.alias }}"
+        APP_DOMAIN="${{ inputs.domain }}"
+        
+        if [[ -z "$APP_NAME" ]]; then
+          APP_NAME="${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}"
+        fi
+        
+        if [[ -z "$APP_ALIAS" ]]; then
+          APP_ALIAS="${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}"
+        fi
+        
+        if [[ -z "$APP_DOMAIN" ]]; then
+          APP_DOMAIN="${{ github.event.pull_request.base.repo.name }}-PR-${{ github.event.number }}.cleverapps.io"
+        fi
+        
+        echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
+        echo "APP_ALIAS=$APP_ALIAS" >> $GITHUB_ENV
+        echo "APP_DOMAIN=$APP_DOMAIN" >> $GITHUB_ENV
+        
+        echo "✅ Environment variables set:"
+        echo "  APP_NAME: $APP_NAME"
+        echo "  APP_ALIAS: $APP_ALIAS" 
+        echo "  APP_DOMAIN: $APP_DOMAIN"
+
     # Create a comment on the PR to notify that the preview app is being deployed.
     - name: Create comment
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.comment }}
@@ -206,7 +231,7 @@ runs:
         }
         echo "✅ Build-flavor configured successfully"
 
-    - name: Set environment variables
+    - name: Set Clever Cloud environment variables
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.set-env }}
       shell: bash
       run: |
