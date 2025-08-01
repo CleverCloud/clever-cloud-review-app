@@ -170,22 +170,41 @@ runs:
         ORGA_ID: ${{ inputs.orga-id }}
         REGION: ${{ inputs.region }}
       run: |
-        clever create --type ${{ inputs.type }} ${{ env.APP_NAME }} --alias ${{ env.APP_ALIAS }} --region ${{ inputs.region }} --org ${{ inputs.orga-id }}
-        clever domain add ${{ env.APP_DOMAIN }}
+        echo "🚀 Creating app: ${{ env.APP_NAME }}"
+        clever create --type ${{ inputs.type }} ${{ env.APP_NAME }} --alias ${{ env.APP_ALIAS }} --region ${{ inputs.region }} --org ${{ inputs.orga-id }} || {
+          echo "❌ Failed to create app";
+          exit 1;
+        }
+        echo "🌐 Adding domain: ${{ env.APP_DOMAIN }}"
+        clever domain add ${{ env.APP_DOMAIN }} || {
+          echo "❌ Failed to add domain";
+          exit 1;
+        }
+        echo "✅ App created successfully"
 
     # Configure the application flavor if it is provided in the inputs.
     - name: Configure flavor
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.flavor != '' }}
       shell: bash
       run: |
-        clever scale --flavor ${{ inputs.flavor }}
+        echo "⚙️ Configuring flavor: ${{ inputs.flavor }}"
+        clever scale --flavor ${{ inputs.flavor }} || {
+          echo "❌ Failed to configure flavor";
+          exit 1;
+        }
+        echo "✅ Flavor configured successfully"
 
     # Configure the build flavor for the application if it is provided in the inputs.
     - name: Configure build-flavor
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.build-flavor != '' }}
       shell: bash
       run: |
-        clever scale --build-flavor ${{ inputs.build-flavor }}
+        echo "🔧 Configuring build-flavor: ${{ inputs.build-flavor }}"
+        clever scale --build-flavor ${{ inputs.build-flavor }} || {
+          echo "❌ Failed to configure build-flavor";
+          exit 1;
+        }
+        echo "✅ Build-flavor configured successfully"
 
     - name: Set environment variables
       if: ${{ (github.event.action == 'opened' || github.event.action == 'reopened') && inputs.set-env }}
@@ -203,7 +222,13 @@ runs:
       if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
       shell: bash
       id: deploy
-      run: clever deploy || { echo "Deployment failed"; exit 1; }
+      run: |
+        echo "🚀 Deploying app..."
+        clever deploy || {
+          echo "❌ Deployment failed";
+          exit 1;
+        }
+        echo "✅ App deployed successfully"
     # Update the PR comment with a link to the deployed review app once deployment is successful.
     - name: Comment PR
       if: ${{ steps.deploy.outcome == 'success' && inputs.comment }}
@@ -235,8 +260,17 @@ runs:
       shell: bash
       id: update
       run: |
-        clever link -o ${{ inputs.orga-id }} ${{ env.APP_NAME }}
-        clever deploy --force
+        echo "🔗 Linking to existing app: ${{ env.APP_NAME }}"
+        clever link -o ${{ inputs.orga-id }} ${{ env.APP_NAME }} || {
+          echo "❌ Failed to link to app";
+          exit 1;
+        }
+        echo "🚀 Redeploying app..."
+        clever deploy --force || {
+          echo "❌ Redeployment failed";
+          exit 1;
+        }
+        echo "✅ App redeployed successfully"
     # Find and update the existing comment on the PR with the latest deployment information.
     - name: Find Comment
       if: ${{ inputs.comment }}
@@ -289,8 +323,15 @@ runs:
       shell: bash
       id: delete
       run: |
-        clever link -o ${{ inputs.orga-id }} ${{ env.APP_NAME }}
-        clever delete --alias ${{ env.APP_ALIAS }} --yes
+        echo "🔗 Linking to app for deletion: ${{ env.APP_NAME }}"
+        clever link -o ${{ inputs.orga-id }} ${{ env.APP_NAME }} || {
+          echo "⚠️ Failed to link to app (may already be deleted)";
+        }
+        echo "🗑️ Deleting app: ${{ env.APP_ALIAS }}"
+        clever delete --alias ${{ env.APP_ALIAS }} --yes || {
+          echo "⚠️ Failed to delete app (may already be deleted)";
+        }
+        echo "✅ App deletion completed"
 
     - name: Comment PR on deletion
       if: ${{ steps.delete.outcome == 'success' && inputs.comment }}
