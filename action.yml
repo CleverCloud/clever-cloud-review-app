@@ -103,6 +103,17 @@ inputs:
     required: false
     default: true
     type: boolean
+outputs:
+  app-url:
+    description: 'URL of the deployed review app'
+    value: ${{ steps.set-outputs.outputs.app-url }}
+  app-name:
+    description: 'Name of the created app'
+    value: ${{ steps.set-outputs.outputs.app-name }}
+  deployment-status:
+    description: 'Status of the deployment'
+    value: ${{ steps.set-outputs.outputs.deployment-status }}
+
 runs:
   using: "composite"
   steps:
