@@ -10,8 +10,8 @@ The action will consider both branches on the same repository, and pull requests
 
 ## Requirements for this Action
 
-- [A Clever Cloud account](https://www.clever-cloud.com)
-- [Clever Tools](https://developers.clever-cloud.com/doc/cli) installed in your machine to get your tokens
+- [A Clever Cloud account](https://console.clever-cloud.com)
+- [Clever Tools](https://www.clever.cloud/developers/doc/cli) installed in your machine to get your tokens
 
 ### Mandatory configuration
 
@@ -75,7 +75,7 @@ on:
 
 ### Values for `type`
 
-Choose one [of the runtimes that Clever Cloud support](https://www.clever-cloud.com/developers/doc/applications/) to deploy your review app:
+Choose one [of the runtimes that Clever Cloud supports](https://www.clever.cloud/developers/doc/applications/) to deploy your review app:
 
 - `docker`
 - `elixir`
